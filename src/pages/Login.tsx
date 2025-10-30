@@ -3,22 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Moon, Sun, Globe } from "lucide-react";
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, setLocale } = useI18n();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (user) {
@@ -26,8 +31,24 @@ export default function Login() {
     }
   }, [user, navigate]);
 
+  const isValidWhatsapp = (value: string) => {
+    // Validação simples: E.164 (+DD... até 15 dígitos) ou somente dígitos 8-15
+    const e164 = /^\+?[1-9]\d{7,14}$/;
+    return e164.test(value.replace(/\s|-/g, ""));
+  };
+
+  const isValidEmail = (value: string) => {
+    // Validação simples de e-mail (RFC-like)
+    return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(value);
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Validar e-mail antes de prosseguir
+    if (!isValidEmail(email)) {
+      toast.error(t("auth.emailInvalid"));
+      return;
+    }
     setLoading(true);
 
     try {
@@ -37,13 +58,19 @@ export default function Login() {
         toast.success(t("common.success"));
         navigate("/dashboard");
       } else {
+        // Signup: validar WhatsApp
+        if (!isValidWhatsapp(whatsapp)) {
+          toast.error(t("auth.whatsappInvalid"));
+          setLoading(false);
+          return;
+        }
         const redirectUrl = `${window.location.origin}/dashboard`;
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: redirectUrl,
-            data: { full_name: fullName },
+            data: { full_name: fullName, whatsapp },
           },
         });
         if (error) throw error;
@@ -71,13 +98,53 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-muted/30 p-4">
+      {/* Theme & Language Controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        {/* Theme */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              <span className="sr-only">Change theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              <Sun className="mr-2 h-4 w-4" /> Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <Moon className="mr-2 h-4 w-4" /> Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" />
+              </svg>
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Language */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Globe className="h-5 w-5" />
+              <span className="sr-only">Change language</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setLocale("pt-BR")}>🇧🇷 Português</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocale("en")}>🇺🇸 English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocale("es")}>🇪🇸 Español</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-lg">
-              NF
-            </div>
+          <div className="flex justify-center">
+          <img src="/images/mynf.png" alt="MyNF Logo" className="h-15 w-15 max-w-[80px] rounded-lg object-contain dark:invert" />
           </div>
           <CardTitle className="text-2xl text-center">{t("auth.welcome")}</CardTitle>
           <CardDescription className="text-center">{t("auth.subtitle")}</CardDescription>
@@ -130,6 +197,20 @@ export default function Login() {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                 />
+              </div>
+            )}
+            {!isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp">{t("auth.whatsapp")}</Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  placeholder={t("auth.whatsappPlaceholder")}
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">{t("auth.whatsappHint")}</p>
               </div>
             )}
             <div className="space-y-2">

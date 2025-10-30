@@ -8,81 +8,100 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    /* MyNF — Light inspirado no Dark (tons lavanda suaves) */
+    --mynf-primary: 248 90% 66%; /* lavanda forte, alto contraste */
+    --mynf-secondary: 250 54% 70%; /* mesmo acento do Dark para consistência */
+    --mynf-background: 248 45% 97%; /* fundo claro com leve tom lavanda */
+    --mynf-surface: 248 30% 98%; /* superfície quase branca, levemente tingida */
+    --mynf-text: 240 21% 15%; /* texto escuro principal */
+    --mynf-text-muted: 240 12% 45%; /* texto secundário mais neutro */
+    --mynf-border: 248 15% 88%; /* borda sutil, com leve tom do tema */
+    --mynf-success: 145 63% 42%; /* mantido */
+    --mynf-error: 0 79% 63%; /* mantido */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    /* Aplicação dos tokens MyNF nos tokens base */
+    --background: var(--mynf-background);
+    --foreground: var(--mynf-text);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --card: var(--mynf-surface);
+    --card-foreground: var(--mynf-text);
 
-    --primary: 215 85% 45%;
+    --popover: var(--mynf-surface);
+    --popover-foreground: var(--mynf-text);
+
+    --primary: var(--mynf-primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 185 70% 45%;
+    --secondary: var(--mynf-secondary);
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 248 40% 96%;
+    --muted-foreground: var(--mynf-text-muted);
 
-    --accent: 30 85% 55%;
+    --accent: var(--mynf-secondary);
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 85% 60%;
+    --destructive: var(--mynf-error);
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 215 85% 45%;
+    --border: var(--mynf-border);
+    --input: var(--mynf-border);
+    --ring: var(--mynf-primary);
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
+    /* Sidebar — versão clara com leve tom lavanda */
+    --sidebar-background: 248 45% 97%;
+    --sidebar-foreground: 240 9% 22%;
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
+    --sidebar-accent: 248 25% 94%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 248 15% 88%;
+    --sidebar-ring: 248 90% 66%;
   }
 
   .dark {
-    --background: 215 28% 10%;
-    --foreground: 210 40% 98%;
+    /* MyNF — Paleta Neon Soft (Dark) */
+    --mynf-primary: 248 100% 77%; /* #9B8CFF */
+    --mynf-secondary: 250 54% 70%; /* #3ABEFF */
+    --mynf-background: 232 18% 9%; /* #12131A */
+    --mynf-surface: 240 21% 15%; /* #1E1E2E */
+    --mynf-text: 227 32% 97%; /* #F5F6FA */
+    --mynf-text-muted: 240 12% 67%; /* #A1A1B5 */
+    --mynf-border: 240 14% 20%; /* #2C2C3A */
+    --mynf-success: 145 63% 42%; /* #27AE60 */
+    --mynf-error: 0 100% 71%; /* #FF6B6B */
 
-    --card: 215 25% 12%;
-    --card-foreground: 210 40% 98%;
+    /* Aplicação dos tokens MyNF nos tokens base (Dark) */
+    --background: var(--mynf-background);
+    --foreground: var(--mynf-text);
 
-    --popover: 215 25% 12%;
-    --popover-foreground: 210 40% 98%;
+    --card: var(--mynf-surface);
+    --card-foreground: var(--mynf-text);
 
-    --primary: 215 85% 55%;
+    --popover: var(--mynf-surface);
+    --popover-foreground: var(--mynf-text);
+
+    --primary: var(--mynf-primary);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 185 70% 50%;
+    --secondary: var(--mynf-secondary);
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 25% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: var(--mynf-text-muted);
 
-    --accent: 30 85% 60%;
+    --accent: var(--mynf-secondary);
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 85% 60%;
+    --destructive: var(--mynf-error);
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 25% 18%;
-    --input: 215 25% 18%;
-    --ring: 215 85% 55%;
+    --border: var(--mynf-border);
+    --input: var(--mynf-border);
+    --ring: var(--mynf-primary);
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -90,7 +109,7 @@ All colors MUST be HSL.
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 248 100% 77%;
   }
 }
 
@@ -102,4 +121,20 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Fix: manter fundo consistente em estados de autofill/paste (especialmente Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: hsl(var(--foreground));
+  -webkit-box-shadow: 0 0 0px 1000px hsl(var(--card)) inset;
+  caret-color: hsl(var(--foreground));
+  transition: background-color 5000s ease-in-out 0s;
 }
