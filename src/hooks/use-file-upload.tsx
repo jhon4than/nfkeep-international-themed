@@ -9,7 +9,7 @@ async function uploadToSupabase(file: File) {
 
   const { error } = await supabase.storage
     .from("invoices")
-    .upload(`user_${userId}/${Date.now()}_${file.name}`, file);
+    .upload(`${userId}/${Date.now()}_${file.name}`, file);
 
   if (error) {
     throw error.message;
@@ -51,7 +51,7 @@ export function useFileUpload(
       .finally(() => {
         setFile(null);
       });
-  }, [file]);
+  }, [file, onSuccessCallback, onErrorCallback]);
 
   return { file, uploadState, uploadFile: setFile };
 }

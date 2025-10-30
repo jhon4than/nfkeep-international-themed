@@ -1,81 +1,65 @@
-# Welcome to your Lovable project
+# 📦 myNF — Gerenciador de Notas Fiscais e Garantias
 
-## Project info
+**myNF** é um sistema simples e eficiente para armazenar notas fiscais de produtos e acompanhar os prazos de garantia de forma automatizada. Ideal para consumidores que desejam manter controle sobre suas compras e evitar surpresas com garantias vencidas.
 
-**URL**: https://lovable.dev/projects/6039cfc1-f1e1-446f-b02f-f3e8f7a426e0
+---
 
-## How can I edit this code?
+## 🚀 Funcionalidades
 
-There are several ways of editing your application.
+- 📁 **Armazenamento de Notas Fiscais**  
+  Faça upload de arquivos PDF, imagens ou fotos de suas notas fiscais diretamente no sistema.
 
-**Deployment & Auth redirect configuration**
+- ⏳ **Controle de Garantia**  
+  O sistema calcula automaticamente o prazo de garantia com base na data da compra e alerta quando estiver próximo do vencimento.
 
-- Defina a URL pública do app no ambiente: crie `VITE_SITE_URL` com o domínio (ex.: `https://my-nf.vercel.app`). Em dev, o app usa `http://localhost:8080`.
-- No Supabase (Authentication → URL Configuration):
-  - Site URL: `https://my-nf.vercel.app`
-  - Additional Redirect URLs: adicione `https://my-nf.vercel.app`, `http://localhost:8080` (e outros domínios de preview, se necessário).
-- O app usa `VITE_SITE_URL` para construir `redirectTo` (OAuth) e `emailRedirectTo` (sign up por e-mail), evitando links indo para `localhost` em produção.
+- 🔔 **Notificações Inteligentes**  
+  Receba lembretes por e-mail ou push quando uma garantia estiver prestes a expirar.
 
-**Use Lovable**
+- 🔍 **Busca Rápida**  
+  Encontre notas fiscais por nome do produto, loja, data de compra ou status da garantia.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6039cfc1-f1e1-446f-b02f-f3e8f7a426e0) and start prompting.
+- 🛡️ **Segurança e Privacidade**  
+  Seus dados são protegidos com autenticação segura e criptografia de arquivos.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🧑‍💻 Como Usar
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Cadastro/Login**  
+   Crie uma conta ou entre com seu e-mail para acessar o sistema.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Upload de Nota Fiscal**  
+   Vá até a aba "Minhas Notas" e envie o arquivo da nota fiscal. Informe a data da compra e o prazo de garantia (se não estiver na nota).
 
-Follow these steps:
+3. **Visualização e Filtros**  
+   Acompanhe todas as suas notas em uma lista organizada com filtros por status de garantia.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+4. **Alertas**  
+   Ative as notificações para ser avisado antes do vencimento da garantia.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🛠️ Tecnologias Utilizadas
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- **Frontend:** React + TypeScript  
+- **Backend:** Supabase (Auth, Database, Storage)  
+- **Design:** Tailwind CSS + Lucide Icons
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📌 Exemplo de Caso de Uso
 
-**Use GitHub Codespaces**
+Imagine que você comprou uma geladeira com 12 meses de garantia. Ao cadastrar a nota fiscal no myNF, o sistema irá:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Armazenar o arquivo da nota
+- Registrar a data da compra
+- Calcular a data de vencimento da garantia
+- Enviar um alerta 30 dias antes do vencimento
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 📱 Versão Mobile
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+O sistema é responsivo e pode ser acessado via navegador em smartphones. Uma versão mobile dedicada está em desenvolvimento.
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/6039cfc1-f1e1-446f-b02f-f3e8f7a426e0) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
