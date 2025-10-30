@@ -22,6 +22,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { LayoutDashboard, FileText, Upload as UploadIcon, User, Moon, Sun, Globe, LogOut, Check } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 type AppSidebarLayoutProps = {
   children: React.ReactNode;
@@ -37,18 +38,17 @@ export function AppSidebarLayout({ children }: AppSidebarLayoutProps) {
     const { state, toggleSidebar } = useSidebar();
     return (
       <SidebarHeader className="flex items-center gap-3 p-2">
-        <Link
-          to="/dashboard"
-          className="flex items-center gap-2 group-data-[collapsible=icon]:hidden"
+        <Logo 
+          size="lg"
+          linkTo="/dashboard"
+          className="group-data-[collapsible=icon]:hidden"
           onClick={(e) => {
             if (state === "collapsed") {
               e.preventDefault();
               toggleSidebar();
             }
           }}
-        >
-          <img src="/images/mynf.png" alt="MyNF Logo" className="h-15 w-15 max-w-[80px] rounded-lg object-contain dark:invert" />
-        </Link>
+        />
         <SidebarTrigger className="ml-auto" />
       </SidebarHeader>
     );

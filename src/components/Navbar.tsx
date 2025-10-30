@@ -13,6 +13,7 @@ import {
 import { Moon, Sun, Globe, LogOut, Menu, LayoutDashboard, FileText, Upload as UploadIcon, User, Check } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Logo } from "@/components/Logo";
 
 export function Navbar() {
   const { signOut } = useAuth();
@@ -153,9 +154,7 @@ export function Navbar() {
 
         {/* Mobile: Logo centralizada */}
         <div className="flex md:hidden justify-center">
-          <Link to="/dashboard" className="flex items-center gap-2">
-          <img src="/images/mynf.png" alt="MyNF Logo" className="h-15 w-15 max-w-[80px] rounded-lg object-contain dark:invert" />
-          </Link>
+          <Logo size="lg" linkTo="/dashboard" />
         </div>
 
         {/* Controles (direita no mobile, direita no desktop) */}

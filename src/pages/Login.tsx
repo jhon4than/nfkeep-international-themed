@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Moon, Sun, Globe } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -151,7 +152,7 @@ export default function Login() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex justify-center">
-          <img src="/images/mynf.png" alt="MyNF Logo" className="h-15 w-15 max-w-[80px] rounded-lg object-contain dark:invert" />
+            <Logo size="lg" className="max-w-[80px]" />
           </div>
           <CardTitle className="text-2xl text-center">{t("auth.welcome")}</CardTitle>
           <CardDescription className="text-center">{t("auth.subtitle")}</CardDescription>
