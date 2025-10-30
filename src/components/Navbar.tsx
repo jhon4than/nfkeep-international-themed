@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Globe, LogOut, Menu } from "lucide-react";
+import { Moon, Sun, Globe, LogOut, Menu, LayoutDashboard, FileText, Upload as UploadIcon, User, Check } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function Navbar() {
   const { signOut } = useAuth();
@@ -20,26 +21,33 @@ export function Navbar() {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/dashboard", label: t("nav.dashboard") },
-    { to: "/invoices", label: t("nav.invoices") },
-    { to: "/upload", label: t("nav.upload") },
-    { to: "/profile", label: t("nav.profile") },
+    { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+    { to: "/invoices", label: t("nav.invoices"), icon: FileText },
+    { to: "/upload", label: t("nav.upload"), icon: UploadIcon },
+    { to: "/profile", label: t("nav.profile"), icon: User },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
-  const NavLinks = () => (
+  const NavLinks = ({ variant = "desktop" }: { variant?: "mobile" | "desktop" }) => (
     <>
       {navLinks.map((link) => (
         <Link
           key={link.to}
           to={link.to}
-          className={`text-sm font-medium transition-colors hover:text-primary ${
-            isActive(link.to)
-              ? "text-primary"
-              : "text-muted-foreground"
-          }`}
+          className={
+            variant === "mobile"
+              ? `flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors justify-start ${
+                  isActive(link.to)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"
+                }`
+              : `flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${
+                  isActive(link.to) ? "text-primary" : "text-muted-foreground"
+                }`
+          }
         >
+          {link.icon && <link.icon className="h-4 w-4" />}
           {link.label}
         </Link>
       ))}
@@ -48,86 +56,118 @@ export function Navbar() {
 
   return (
     <nav className="border-b bg-card">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto grid grid-cols-3 h-20 md:h-16 items-center px-4 md:flex md:justify-between">
+        {/* Mobile: Menu à esquerda | Desktop: Logo + Links à esquerda */}
         <div className="flex items-center gap-6">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-              NF
-            </div>
-            <span className="text-xl font-bold">NF-Keep</span>
-          </Link>
-          <div className="hidden md:flex gap-6">
-            <NavLinks />
+          {/* Mobile menu (esquerda) */}
+          <div className="flex md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="rounded-r-[5px]">
+                <div className="flex flex-col gap-5 mt-8">
+                  <NavLinks variant="mobile" />
+                  {/* Dropdown de Tema */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors justify-start text-muted-foreground hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground">
+                        <Sun className="h-5 w-5 mr-2" />
+                        Tema
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md">
+                      <DropdownMenuItem
+                        className={`${theme === "light" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
+                        onClick={() => setTheme("light")}
+                      >
+                        <Sun className="h-4 w-4 mr-2" /> Claro
+                        {theme === "light" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className={`${theme === "dark" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
+                        onClick={() => setTheme("dark")}
+                      >
+                        <Moon className="h-4 w-4 mr-2" /> Escuro
+                        {theme === "dark" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className={`${theme === "system" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
+                        onClick={() => setTheme("system")}
+                      >
+                        <Sun className="h-4 w-4 mr-2" /> Sistema
+                        {theme === "system" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Dropdown de Idioma */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors justify-start text-muted-foreground hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground">
+                        <Globe className="h-5 w-5 mr-2" />
+                        Idioma
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md">
+                      <DropdownMenuItem
+                        className={`${locale === "pt-BR" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
+                        onClick={() => setLocale("pt-BR")}
+                      >
+                        🇧🇷 Português
+                        {locale === "pt-BR" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className={`${locale === "en" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
+                        onClick={() => setLocale("en")}
+                      >
+                        🇺🇸 English
+                        {locale === "en" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className={`${locale === "es" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
+                        onClick={() => setLocale("es")}
+                      >
+                        🇪🇸 Español
+                        {locale === "es" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <button onClick={signOut} className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors justify-start text-muted-foreground hover:bg-mynf-secondary hover:text-mynf-secondary-foreground">
+                    <LogOut className="h-5 w-5 mr-2" />
+                    {t("nav.logout")}
+                  </button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Desktop: Logo + NavLinks */}
+          <div className="hidden md:flex items-center gap-6">
+            {/* Logo e toggle foram movidos para a Sidebar header; no desktop evitamos duplicação */}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Theme Toggle */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Mobile: Logo centralizada */}
+        <div className="flex md:hidden justify-center">
+          <Link to="/dashboard" className="flex items-center gap-2">
+          <img src="/images/mynf.png" alt="MyNF Logo" className="h-15 w-15 max-w-[80px] rounded-lg object-contain dark:invert" />
+          </Link>
+        </div>
 
-          {/* Language Switcher */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Globe className="h-5 w-5" />
-                <span className="sr-only">Change language</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLocale("pt-BR")}>
-                🇧🇷 Português
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLocale("en")}>
-                🇺🇸 English
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLocale("es")}>
-                🇪🇸 Español
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Controles (direita no mobile, direita no desktop) */}
+        <div className="flex items-center gap-2 justify-self-end">
+          {/* Theme Toggle */}
+     
 
           {/* Logout */}
           <Button variant="ghost" size="icon" onClick={signOut} className="hidden md:flex">
             <LogOut className="h-5 w-5" />
             <span className="sr-only">{t("nav.logout")}</span>
           </Button>
-
-          {/* Mobile Menu */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <div className="flex flex-col gap-4 mt-8">
-                <NavLinks />
-                <Button variant="ghost" onClick={signOut} className="justify-start">
-                  <LogOut className="h-5 w-5 mr-2" />
-                  {t("nav.logout")}
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </nav>
