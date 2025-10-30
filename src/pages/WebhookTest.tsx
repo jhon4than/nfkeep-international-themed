@@ -14,41 +14,46 @@ export default function WebhookTest() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const webhookUrl = import.meta.env.VITE_WEBHOOK_ANALISAR_FOTO;
 
+  const processFile = (file: File) => {
+    // Verificar se é uma imagem, PDF ou XML
+    const allowedTypes = ['image/', 'application/pdf', 'text/xml', 'application/xml'];
+    const isValidType = allowedTypes.some(type => file.type.startsWith(type)) || 
+                       file.name.toLowerCase().endsWith('.xml');
+    
+    if (!isValidType) {
+      toast.error('Por favor, selecione apenas arquivos de imagem, PDF ou XML');
+      return;
+    }
+
+    // Verificar tamanho (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Arquivo muito grande. Máximo 10MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    
+    // Criar preview apenas para imagens
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewUrl(null);
+    }
+  };
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Verificar se é uma imagem ou PDF
-      const allowedTypes = ['image/', 'application/pdf'];
-      const isValidType = allowedTypes.some(type => file.type.startsWith(type));
-      
-      if (!isValidType) {
-        toast.error('Por favor, selecione apenas arquivos de imagem ou PDF');
-        return;
-      }
-
-      // Verificar tamanho (máximo 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Arquivo muito grande. Máximo 10MB');
-        return;
-      }
-
-      setSelectedFile(file);
-      
-      // Criar preview da imagem ou mostrar ícone do PDF
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setPreviewUrl(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // Para PDFs, não criar preview de imagem
-        setPreviewUrl(null);
-      }
+      processFile(file);
     }
   };
 
@@ -58,34 +63,7 @@ export default function WebhookTest() {
     
     const file = event.dataTransfer.files[0];
     if (file) {
-      // Verificar se é uma imagem ou PDF
-      const allowedTypes = ['image/', 'application/pdf'];
-      const isValidType = allowedTypes.some(type => file.type.startsWith(type));
-      
-      if (!isValidType) {
-        toast.error('Por favor, selecione apenas arquivos de imagem ou PDF');
-        return;
-      }
-
-      // Verificar tamanho (máximo 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Arquivo muito grande. Máximo 10MB');
-        return;
-      }
-
-      setSelectedFile(file);
-      
-      // Criar preview da imagem ou mostrar ícone do PDF
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setPreviewUrl(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // Para PDFs, não criar preview de imagem
-        setPreviewUrl(null);
-      }
+      processFile(file);
     }
   };
 
@@ -93,9 +71,19 @@ export default function WebhookTest() {
     event.preventDefault();
   };
 
+  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
   const sendToWebhook = async () => {
     if (!selectedFile) {
-      toast.error('Por favor, selecione uma imagem primeiro');
+      toast.error('Por favor, selecione um arquivo primeiro');
       return;
     }
 
@@ -108,13 +96,61 @@ export default function WebhookTest() {
     setResponse(null);
 
     try {
+      // Criar FormData para enviar arquivo binário
       const formData = new FormData();
-      formData.append('image', selectedFile);
+      formData.append('file', selectedFile);
       formData.append('filename', selectedFile.name);
       formData.append('timestamp', new Date().toISOString());
+      
+      // Debug: verificar se o arquivo está sendo anexado
+      console.log('Arquivo selecionado:', {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type
+      });
+      
+      // Prompt otimizado para análise da nota fiscal
+      const prompt = `Analise esta nota fiscal e extraia APENAS as informações essenciais em formato JSON:
+
+{
+  "access_key": "",
+  "number": "",
+  "series": "",
+  "issue_date": "",
+  "total_amount": "",
+  "kind": "",
+  "emitente": {
+    "cnpj": "",
+    "name": ""
+  },
+  "itens": [
+    {
+      "description": "",
+      "quantity": "",
+      "unit_price": "",
+      "line_total": ""
+    }
+  ]
+}
+
+INSTRUÇÕES:
+- access_key: Chave de acesso da NFe (44 dígitos) ou código de verificação
+- number: Número da nota fiscal
+- series: Série da nota (se houver)
+- issue_date: Data de emissão no formato YYYY-MM-DD
+- total_amount: Valor total em formato numérico (ex: 8855.48)
+- kind: Tipo da nota ("nfe", "nfce", "nfse" ou "sat")
+- emitente.cnpj: CNPJ do prestador/emitente (apenas números)
+- emitente.name: Razão social ou nome fantasia do emitente
+- itens: Lista com descrição, quantidade, valor unitário e total de cada item
+
+Se alguma informação não estiver disponível, deixe o campo vazio (""). Retorne APENAS o JSON válido.`;
+      
+      formData.append('prompt', prompt);
 
       const response = await fetch(webhookUrl, {
         method: 'POST',
+        // NÃO definir Content-Type - deixar o browser definir com boundary
         body: formData,
       });
 
@@ -134,7 +170,7 @@ export default function WebhookTest() {
       });
 
       if (response.ok) {
-        toast.success('Imagem enviada com sucesso!');
+        toast.success('Arquivo enviado com sucesso!');
       } else {
         toast.error(`Erro: ${response.status} - ${response.statusText}`);
       }
@@ -179,9 +215,15 @@ export default function WebhookTest() {
               <div className="space-y-4">
                 <Label>Selecionar Imagem</Label>
                 <div
-                  className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer"
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                    isDragging 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+                  }`}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {selectedFile ? (
@@ -193,13 +235,20 @@ export default function WebhookTest() {
                           className="max-w-full max-h-64 mx-auto rounded-lg shadow-md"
                         />
                       ) : selectedFile.type === 'application/pdf' ? (
-                        <div className="w-32 h-32 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center mx-auto">
-                          <div className="text-center">
-                            <div className="text-red-600 text-2xl mb-2">📄</div>
-                            <div className="text-xs text-red-600 font-medium">PDF</div>
-                          </div>
-                        </div>
-                      ) : null}
+                         <div className="w-32 h-32 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center mx-auto">
+                           <div className="text-center">
+                             <div className="text-red-600 text-2xl mb-2">📄</div>
+                             <div className="text-xs text-red-600 font-medium">PDF</div>
+                           </div>
+                         </div>
+                       ) : (selectedFile.type === 'text/xml' || selectedFile.type === 'application/xml' || selectedFile.name.toLowerCase().endsWith('.xml')) ? (
+                         <div className="w-32 h-32 bg-blue-50 border-2 border-blue-200 rounded-lg flex items-center justify-center mx-auto">
+                           <div className="text-center">
+                             <div className="text-blue-600 text-2xl mb-2">📋</div>
+                             <div className="text-xs text-blue-600 font-medium">XML</div>
+                           </div>
+                         </div>
+                       ) : null}
                       <p className="text-sm text-muted-foreground">
                         {selectedFile?.name} ({((selectedFile?.size || 0) / 1024 / 1024).toFixed(2)} MB)
                       </p>
@@ -208,7 +257,7 @@ export default function WebhookTest() {
                     <div className="space-y-4">
                       <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
                       <div>
-                        <p className="text-lg font-medium">Arraste uma imagem ou PDF aqui</p>
+                        <p className="text-lg font-medium">Arraste uma imagem, PDF ou XML aqui</p>
                         <p className="text-sm text-muted-foreground">
                           ou clique para selecionar (máximo 10MB)
                         </p>
@@ -219,7 +268,7 @@ export default function WebhookTest() {
                 <Input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*,application/pdf"
+                  accept="image/*,application/pdf,text/xml,application/xml,.xml"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
@@ -292,7 +341,7 @@ export default function WebhookTest() {
               <div>
                 <Label>Campos enviados:</Label>
                 <ul className="text-sm list-disc list-inside space-y-1">
-                  <li>image: arquivo da imagem ou PDF</li>
+                  <li>image: arquivo da imagem, PDF ou XML</li>
                   <li>filename: nome do arquivo</li>
                   <li>timestamp: data/hora do envio</li>
                 </ul>
