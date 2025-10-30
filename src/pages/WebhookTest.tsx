@@ -21,9 +21,12 @@ export default function WebhookTest() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Verificar se é uma imagem
-      if (!file.type.startsWith('image/')) {
-        toast.error('Por favor, selecione apenas arquivos de imagem');
+      // Verificar se é uma imagem ou PDF
+      const allowedTypes = ['image/', 'application/pdf'];
+      const isValidType = allowedTypes.some(type => file.type.startsWith(type));
+      
+      if (!isValidType) {
+        toast.error('Por favor, selecione apenas arquivos de imagem ou PDF');
         return;
       }
 
@@ -35,23 +38,54 @@ export default function WebhookTest() {
 
       setSelectedFile(file);
       
-      // Criar preview da imagem
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewUrl(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      // Criar preview da imagem ou mostrar ícone do PDF
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPreviewUrl(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Para PDFs, não criar preview de imagem
+        setPreviewUrl(null);
+      }
     }
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragging(false);
+    
     const file = event.dataTransfer.files[0];
     if (file) {
-      const fakeEvent = {
-        target: { files: [file] }
-      } as React.ChangeEvent<HTMLInputElement>;
-      handleFileSelect(fakeEvent);
+      // Verificar se é uma imagem ou PDF
+      const allowedTypes = ['image/', 'application/pdf'];
+      const isValidType = allowedTypes.some(type => file.type.startsWith(type));
+      
+      if (!isValidType) {
+        toast.error('Por favor, selecione apenas arquivos de imagem ou PDF');
+        return;
+      }
+
+      // Verificar tamanho (máximo 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Arquivo muito grande. Máximo 10MB');
+        return;
+      }
+
+      setSelectedFile(file);
+      
+      // Criar preview da imagem ou mostrar ícone do PDF
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPreviewUrl(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Para PDFs, não criar preview de imagem
+        setPreviewUrl(null);
+      }
     }
   };
 
@@ -150,22 +184,31 @@ export default function WebhookTest() {
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {previewUrl ? (
+                  {selectedFile ? (
                     <div className="space-y-4">
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="max-w-full max-h-64 mx-auto rounded-lg shadow-md"
-                      />
+                      {selectedFile.type.startsWith('image/') && previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="max-w-full max-h-64 mx-auto rounded-lg shadow-md"
+                        />
+                      ) : selectedFile.type === 'application/pdf' ? (
+                        <div className="w-32 h-32 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center mx-auto">
+                          <div className="text-center">
+                            <div className="text-red-600 text-2xl mb-2">📄</div>
+                            <div className="text-xs text-red-600 font-medium">PDF</div>
+                          </div>
+                        </div>
+                      ) : null}
                       <p className="text-sm text-muted-foreground">
-                        {selectedFile?.name} ({(selectedFile?.size || 0 / 1024 / 1024).toFixed(2)} MB)
+                        {selectedFile?.name} ({((selectedFile?.size || 0) / 1024 / 1024).toFixed(2)} MB)
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
                       <div>
-                        <p className="text-lg font-medium">Arraste uma imagem aqui</p>
+                        <p className="text-lg font-medium">Arraste uma imagem ou PDF aqui</p>
                         <p className="text-sm text-muted-foreground">
                           ou clique para selecionar (máximo 10MB)
                         </p>
@@ -176,7 +219,7 @@ export default function WebhookTest() {
                 <Input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
@@ -249,7 +292,7 @@ export default function WebhookTest() {
               <div>
                 <Label>Campos enviados:</Label>
                 <ul className="text-sm list-disc list-inside space-y-1">
-                  <li>image: arquivo da imagem</li>
+                  <li>image: arquivo da imagem ou PDF</li>
                   <li>filename: nome do arquivo</li>
                   <li>timestamp: data/hora do envio</li>
                 </ul>
