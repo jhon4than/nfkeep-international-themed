@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Invoices from "./pages/Invoices";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
+import WebhookTest from "./pages/WebhookTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/webhook-test"
+                  element={
+                    <ProtectedRoute>
+                      <WebhookTest />
                     </ProtectedRoute>
                   }
                 />
