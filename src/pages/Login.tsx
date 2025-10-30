@@ -25,6 +25,9 @@ export default function Login() {
   const { t, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
 
+  // Base URL para redirecionamentos (produção ou dev)
+  const SITE_URL = import.meta.env.VITE_SITE_URL || window.location.origin;
+
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
@@ -64,7 +67,7 @@ export default function Login() {
           setLoading(false);
           return;
         }
-        const redirectUrl = `${window.location.origin}/dashboard`;
+        const redirectUrl = `${SITE_URL}/dashboard`;
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -86,14 +89,18 @@ export default function Login() {
 
   const handleGoogleAuth = async () => {
     try {
-      const redirectUrl = `${window.location.origin}/dashboard`;
+      const redirectUrl = `${SITE_URL}/dashboard`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectUrl },
       });
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message);
+      const friendly =
+        error?.error_code === "validation_failed" || /Unsupported provider/i.test(error?.message)
+          ? "Login com Google não está habilitado no Supabase ou há divergência de projeto/variáveis. Verifique se o provedor Google está ativado no mesmo projeto das chaves usadas no app e se as URLs de redirecionamento estão corretas."
+          : error?.message ?? "Erro ao iniciar login com Google.";
+      toast.error(friendly);
     }
   };
 
@@ -109,14 +116,14 @@ export default function Login() {
               <span className="sr-only">Change theme</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="space-y-2">
             <DropdownMenuItem onClick={() => setTheme("light")}>
               <Sun className="mr-2 h-4 w-4" /> Light
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setTheme("dark")}>
               <Moon className="mr-2 h-4 w-4" /> Dark
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("system")}>
+            <DropdownMenuItem onClick={() => setTheme("system")}> 
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                 <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" />
@@ -134,7 +141,7 @@ export default function Login() {
               <span className="sr-only">Change language</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="space-y-2">
             <DropdownMenuItem onClick={() => setLocale("pt-BR")}>🇧🇷 Português</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocale("en")}>🇺🇸 English</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocale("es")}>🇪🇸 Español</DropdownMenuItem>
