@@ -26,11 +26,16 @@ const translations: Record<Locale, Record<string, string>> = {
     "auth.email": "E-mail",
     "auth.password": "Senha",
     "auth.fullName": "Nome Completo",
+    "auth.emailInvalid": "Informe um e-mail válido.",
+    "auth.whatsapp": "WhatsApp",
+    "auth.whatsappPlaceholder": "+55 11 91234-5678",
+    "auth.whatsappHint": "Informe um número de WhatsApp válido (com DDD e, se possível, com código do país).",
+    "auth.whatsappInvalid": "Informe um WhatsApp válido.",
     "auth.continueWithGoogle": "Continuar com Google",
     "auth.or": "ou",
     "auth.haveAccount": "Já tem uma conta?",
     "auth.noAccount": "Não tem uma conta?",
-    "auth.welcome": "Bem-vindo ao NF-Keep",
+    "auth.welcome": "Bem-vindo ao MyNF",
     "auth.subtitle": "Gerencie suas notas fiscais com segurança",
     // Dashboard
     "dashboard.title": "Painel",
@@ -54,6 +59,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "profile.title": "Meu Perfil",
     "profile.updateSuccess": "Perfil atualizado com sucesso!",
     "profile.save": "Salvar Alterações",
+    "profile.whatsapp": "WhatsApp",
     // Common
     "common.loading": "Carregando...",
     "common.error": "Erro",
@@ -72,11 +78,16 @@ const translations: Record<Locale, Record<string, string>> = {
     "auth.email": "Email",
     "auth.password": "Password",
     "auth.fullName": "Full Name",
+    "auth.emailInvalid": "Please provide a valid email.",
+    "auth.whatsapp": "WhatsApp",
+    "auth.whatsappPlaceholder": "+1 415 555 2671",
+    "auth.whatsappHint": "Provide a valid WhatsApp number (include area and country code).",
+    "auth.whatsappInvalid": "Please provide a valid WhatsApp number.",
     "auth.continueWithGoogle": "Continue with Google",
     "auth.or": "or",
     "auth.haveAccount": "Already have an account?",
     "auth.noAccount": "Don't have an account?",
-    "auth.welcome": "Welcome to NF-Keep",
+    "auth.welcome": "Welcome to MyNF",
     "auth.subtitle": "Manage your invoices securely",
     // Dashboard
     "dashboard.title": "Dashboard",
@@ -100,6 +111,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "profile.title": "My Profile",
     "profile.updateSuccess": "Profile updated successfully!",
     "profile.save": "Save Changes",
+    "profile.whatsapp": "WhatsApp",
     // Common
     "common.loading": "Loading...",
     "common.error": "Error",
@@ -118,11 +130,16 @@ const translations: Record<Locale, Record<string, string>> = {
     "auth.email": "Correo Electrónico",
     "auth.password": "Contraseña",
     "auth.fullName": "Nombre Completo",
+    "auth.emailInvalid": "Indique un correo electrónico válido.",
+    "auth.whatsapp": "WhatsApp",
+    "auth.whatsappPlaceholder": "+34 600 123 456",
+    "auth.whatsappHint": "Indique un número de WhatsApp válido (incluya código de área y país).",
+    "auth.whatsappInvalid": "Indique un número de WhatsApp válido.",
     "auth.continueWithGoogle": "Continuar con Google",
     "auth.or": "o",
     "auth.haveAccount": "¿Ya tienes una cuenta?",
     "auth.noAccount": "¿No tienes una cuenta?",
-    "auth.welcome": "Bienvenido a NF-Keep",
+    "auth.welcome": "Bienvenido a MyNF",
     "auth.subtitle": "Gestiona tus facturas de forma segura",
     // Dashboard
     "dashboard.title": "Panel",
@@ -146,6 +163,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "profile.title": "Mi Perfil",
     "profile.updateSuccess": "¡Perfil actualizado correctamente!",
     "profile.save": "Guardar Cambios",
+    "profile.whatsapp": "WhatsApp",
     // Common
     "common.loading": "Cargando...",
     "common.error": "Error",
@@ -162,12 +180,12 @@ const detectBrowserLanguage = (): Locale => {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
-    const stored = localStorage.getItem("nfkeep:locale");
+    const stored = localStorage.getItem("mynf:locale");
     return (stored as Locale) || detectBrowserLanguage();
   });
 
   useEffect(() => {
-    localStorage.setItem("nfkeep:locale", locale);
+    localStorage.setItem("mynf:locale", locale);
   }, [locale]);
 
   const t = (key: string): string => {
