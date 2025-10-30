@@ -24,6 +24,7 @@ export function Navbar() {
     { to: "/invoices", label: t("nav.invoices") },
     { to: "/upload", label: t("nav.upload") },
     { to: "/profile", label: t("nav.profile") },
+    { to: "/webhook-test", label: "Webhook Test" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
