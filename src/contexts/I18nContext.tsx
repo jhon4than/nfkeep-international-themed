@@ -175,7 +175,12 @@ const detectBrowserLanguage = (): Locale => {
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
     const stored = localStorage.getItem("mynf:locale");
-    return (stored as Locale) || detectBrowserLanguage();
+    const normalized = stored === "pt" ? "pt-BR" : stored; // Corrige valor antigo
+    const allowed = ["pt-BR", "en", "es"] as const;
+    if (normalized && (allowed as readonly string[]).includes(normalized)) {
+      return normalized as Locale;
+    }
+    return detectBrowserLanguage();
   });
 
   useEffect(() => {
@@ -183,7 +188,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [locale]);
 
   const t = (key: string): string => {
-    return translations[locale][key] || key;
+    return translations[locale]?.[key] ?? key;
   };
 
   const formatDate = (date: Date): string => {

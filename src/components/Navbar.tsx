@@ -78,7 +78,7 @@ export function Navbar() {
                         Tema
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md">
+          <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md space-y-2">
                       <DropdownMenuItem
                         className={`${theme === "light" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
                         onClick={() => setTheme("light")}
@@ -111,7 +111,7 @@ export function Navbar() {
                         Idioma
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md">
+          <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md space-y-2">
                       <DropdownMenuItem
                         className={`${locale === "pt-BR" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`}
                         onClick={() => setLocale("pt-BR")}

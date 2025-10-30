@@ -110,7 +110,7 @@ export function AppSidebarLayout({ children }: AppSidebarLayoutProps) {
                     <span className="group-data-[collapsible=icon]:hidden">Tema</span>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md">
+                <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md space-y-2">
                   <DropdownMenuItem className={`${theme === "light" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`} onClick={() => setTheme("light")}>
                     Claro
                     {theme === "light" && <Check className="h-4 w-4 ml-auto opacity-70" />}
@@ -134,10 +134,10 @@ export function AppSidebarLayout({ children }: AppSidebarLayoutProps) {
                     <span className="group-data-[collapsible=icon]:hidden">Idioma</span>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md">
-                  <DropdownMenuItem className={`${locale === "pt" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`} onClick={() => setLocale("pt")}>
+                <DropdownMenuContent align="start" className="w-56 bg-popover text-popover-foreground border border-border shadow-md space-y-2">
+                  <DropdownMenuItem className={`${locale === "pt-BR" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`} onClick={() => setLocale("pt-BR")}>
                     🇧🇷 Português
-                    {locale === "pt" && <Check className="h-4 w-4 ml-auto opacity-70" />}
+                    {locale === "pt-BR" && <Check className="h-4 w-4 ml-auto opacity-70" />}
                   </DropdownMenuItem>
                   <DropdownMenuItem className={`${locale === "en" ? "bg-primary text-primary-foreground" : "hover:bg-mynf-secondary/50 hover:text-mynf-secondary-foreground"} flex items-center`} onClick={() => setLocale("en")}>
                     🇺🇸 English

@@ -8,6 +8,14 @@
 
 There are several ways of editing your application.
 
+**Deployment & Auth redirect configuration**
+
+- Defina a URL pública do app no ambiente: crie `VITE_SITE_URL` com o domínio (ex.: `https://my-nf.vercel.app`). Em dev, o app usa `http://localhost:8080`.
+- No Supabase (Authentication → URL Configuration):
+  - Site URL: `https://my-nf.vercel.app`
+  - Additional Redirect URLs: adicione `https://my-nf.vercel.app`, `http://localhost:8080` (e outros domínios de preview, se necessário).
+- O app usa `VITE_SITE_URL` para construir `redirectTo` (OAuth) e `emailRedirectTo` (sign up por e-mail), evitando links indo para `localhost` em produção.
+
 **Use Lovable**
 
 Simply visit the [Lovable Project](https://lovable.dev/projects/6039cfc1-f1e1-446f-b02f-f3e8f7a426e0) and start prompting.
