@@ -121,7 +121,7 @@ export default function Login() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-12 py-8">
         {/* Theme & Language Controls */}
         <div className="absolute top-6 right-6 flex items-center gap-2">
           {/* Theme */}
@@ -165,13 +165,13 @@ export default function Login() {
           </DropdownMenu>
         </div>
 
-        <div className="w-full max-w-sm mx-auto">
+        <div className="w-full max-w-md mx-auto">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center mb-8">
+          <div className="lg:hidden flex justify-center mb-10">
             <Logo size="lg" className="max-w-[80px]" linkTo="" />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-foreground">
                 {isLogin ? t("auth.login") : t("auth.signup")}
@@ -183,7 +183,7 @@ export default function Login() {
 
             <Button
               variant="outline"
-              className="w-full h-11 font-medium"
+              className="w-full h-12 font-medium text-base"
               onClick={handleGoogleAuth}
               type="button"
             >
@@ -217,9 +217,9 @@ export default function Login() {
               </div>
             </div>
 
-            <form onSubmit={handleEmailAuth} className="space-y-4">
+            <form onSubmit={handleEmailAuth} className="space-y-5">
               {!isLogin && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="fullName" className="text-sm font-medium">
                     {t("auth.fullName")}
                   </Label>
@@ -228,13 +228,13 @@ export default function Login() {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="h-11"
+                    className="h-12"
                     required
                   />
                 </div>
               )}
               {!isLogin && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label htmlFor="whatsapp" className="text-sm font-medium">
                     {t("auth.whatsapp")}
                   </Label>
@@ -244,15 +244,15 @@ export default function Login() {
                     placeholder={t("auth.whatsappPlaceholder")}
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
-                    className="h-11"
+                    className="h-12"
                     required
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mt-2">
                     {t("auth.whatsappHint")}
                   </p>
                 </div>
               )}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="email" className="text-sm font-medium">
                   {t("auth.email")}
                 </Label>
@@ -261,11 +261,11 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-11"
+                  className="h-12"
                   required
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label htmlFor="password" className="text-sm font-medium">
                   {t("auth.password")}
                 </Label>
@@ -274,24 +274,26 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-11"
+                  className="h-12"
                   required
                 />
               </div>
-              <Button 
-                type="submit" 
-                className="w-full h-11 font-medium" 
-                disabled={loading}
-              >
-                {loading ? t("common.loading") : isLogin ? t("auth.login") : t("auth.signup")}
-              </Button>
+              <div className="pt-4">
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 font-medium text-base" 
+                  disabled={loading}
+                >
+                  {loading ? t("common.loading") : isLogin ? t("auth.login") : t("auth.signup")}
+                </Button>
+              </div>
             </form>
 
-            <div className="text-center">
+            <div className="text-center pt-6">
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {isLogin ? t("auth.noAccount") : t("auth.haveAccount")}
               </button>
