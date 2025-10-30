@@ -48,6 +48,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "upload.description": "Faça o upload das suas notas fiscais em PDF ou imagem",
     "upload.dropzone": "Arraste arquivos aqui ou clique para selecionar",
     "upload.button": "Fazer Upload",
+    "upload.success": "Nota Fiscal enviada com sucesso!",
+    "upload.error": "Falha ao enviar a nota fiscal, tente novamente mais tarde",
     // Profile
     "profile.title": "Meu Perfil",
     "profile.updateSuccess": "Perfil atualizado com sucesso!",
@@ -92,6 +94,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "upload.description": "Upload your invoices in PDF or image format",
     "upload.dropzone": "Drag files here or click to select",
     "upload.button": "Upload",
+    "upload.success": "Invoice sent successfully!",
+    "upload.error": "Failed to send invoice, please try again later.",
     // Profile
     "profile.title": "My Profile",
     "profile.updateSuccess": "Profile updated successfully!",
@@ -136,6 +140,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "upload.description": "Sube tus facturas en formato PDF o imagen",
     "upload.dropzone": "Arrastra archivos aquí o haz clic para seleccionar",
     "upload.button": "Subir",
+    "upload.success": "¡Factura enviada correctamente!",
+    "upload.error": "No se pudo enviar la factura, inténtelo de nuevo más tarde.",
     // Profile
     "profile.title": "Mi Perfil",
     "profile.updateSuccess": "¡Perfil actualizado correctamente!",
