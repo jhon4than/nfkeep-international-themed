@@ -37,7 +37,7 @@ export function AppSidebarLayout({ children }: AppSidebarLayoutProps) {
   const SidebarLogoHeader = () => {
     const { state, toggleSidebar } = useSidebar();
     return (
-      <SidebarHeader className="flex items-center gap-3 p-2">
+      <SidebarHeader className="flex items-center justify-center gap-3 p-4 py-6">
         <Logo 
           size="lg"
           linkTo="/dashboard"
@@ -49,7 +49,7 @@ export function AppSidebarLayout({ children }: AppSidebarLayoutProps) {
             }
           }}
         />
-        <SidebarTrigger className="ml-auto" />
+        <SidebarTrigger className="absolute top-2 right-2" />
       </SidebarHeader>
     );
   };

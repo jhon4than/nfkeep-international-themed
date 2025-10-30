@@ -37,6 +37,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "auth.noAccount": "Não tem uma conta?",
     "auth.welcome": "Bem-vindo ao MyNF",
     "auth.subtitle": "Gerencie suas notas fiscais com segurança",
+    "auth.description": "Gerencie suas notas fiscais de forma simples e segura",
+    "auth.loginSubtitle": "Acesse sua conta",
+    "auth.signupSubtitle": "Crie sua conta gratuita",
     // Dashboard
     "dashboard.title": "Painel",
     "dashboard.welcome": "Bem-vindo de volta!",
@@ -89,6 +92,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "auth.noAccount": "Don't have an account?",
     "auth.welcome": "Welcome to MyNF",
     "auth.subtitle": "Manage your invoices securely",
+    "auth.description": "Manage your invoices simply and securely",
+    "auth.loginSubtitle": "Access your account",
+    "auth.signupSubtitle": "Create your free account",
     // Dashboard
     "dashboard.title": "Dashboard",
     "dashboard.welcome": "Welcome back!",
@@ -141,6 +147,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "auth.noAccount": "¿No tienes una cuenta?",
     "auth.welcome": "Bienvenido a MyNF",
     "auth.subtitle": "Gestiona tus facturas de forma segura",
+    "auth.description": "Gestiona tus facturas de forma simple y segura",
+    "auth.loginSubtitle": "Accede a tu cuenta",
+    "auth.signupSubtitle": "Crea tu cuenta gratuita",
     // Dashboard
     "dashboard.title": "Panel",
     "dashboard.welcome": "¡Bienvenido de nuevo!",
