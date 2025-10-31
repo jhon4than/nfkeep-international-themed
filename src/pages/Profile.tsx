@@ -137,19 +137,19 @@ export default function Profile() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
-            <main className="container mx-auto p-6 space-y-6">
+      <main className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-4xl">
 
-      <div>
-        <h1 className="text-3xl font-bold">{t("profile.title")}</h1>
+      <div className="px-2 sm:px-0">
+        <h1 className="text-2xl sm:text-3xl font-bold">{t("profile.title")}</h1>
       </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>{t("profile.title")}</CardTitle>
-          <CardDescription>{user?.email}</CardDescription>
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl">{t("profile.title")}</CardTitle>
+          <CardDescription className="text-sm sm:text-base break-all">{user?.email}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="px-4 sm:px-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="fullName">{t("auth.fullName")}</Label>
               <Input
@@ -175,17 +175,17 @@ export default function Profile() {
 
             {/* Seção de Notificações */}
             <div className="space-y-4 pt-4 border-t">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-start sm:items-center space-x-3">
                 {notificationsEnabled ? (
-                  <Bell className="h-5 w-5 text-mynf-primary" />
+                  <Bell className="h-5 w-5 text-mynf-primary flex-shrink-0 mt-0.5 sm:mt-0" />
                 ) : (
-                  <BellOff className="h-5 w-5 text-muted-foreground" />
+                  <BellOff className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5 sm:mt-0" />
                 )}
-                <div className="flex-1">
-                  <Label htmlFor="notifications" className="text-base font-medium">
+                <div className="flex-1 min-w-0">
+                  <Label htmlFor="notifications" className="text-sm sm:text-base font-medium block">
                     Notificações de Alertas
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                     Receba notificações sobre vencimento de garantias e outros alertas importantes
                   </p>
                 </div>
@@ -193,16 +193,17 @@ export default function Profile() {
                   id="notifications"
                   checked={notificationsEnabled}
                   onCheckedChange={setNotificationsEnabled}
+                  className="flex-shrink-0"
                 />
               </div>
               
               {firstVisit && (
-                <div className="bg-mynf-primary/10 border border-mynf-primary/20 rounded-lg p-4">
+                <div className="bg-mynf-primary/10 border border-mynf-primary/20 rounded-lg p-3 sm:p-4">
                   <div className="flex items-start space-x-3">
-                    <Bell className="h-5 w-5 text-mynf-primary mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-mynf-primary">Complete seu cadastro</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
+                    <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-mynf-primary mt-0.5 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-mynf-primary text-sm sm:text-base">Complete seu cadastro</h4>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                         Ative as notificações para receber alertas importantes sobre suas notas fiscais e garantias.
                       </p>
                     </div>
@@ -210,7 +211,7 @@ export default function Profile() {
                 </div>
               )}
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
               {loading ? t("common.loading") : t("profile.save")}
             </Button>
           </form>
