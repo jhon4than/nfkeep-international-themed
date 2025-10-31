@@ -286,7 +286,7 @@ export default function Invoices() {
                         <TableHead>Tipo</TableHead>
                         <TableHead className="text-right">Total</TableHead>
                         <TableHead>Arquivo</TableHead>
-                        <TableHead>Garantia expira em</TableHead>
+                        <TableHead>{t("invoices.warrantyExpiresIn")}</TableHead>
                         <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>

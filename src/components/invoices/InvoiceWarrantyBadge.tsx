@@ -1,3 +1,4 @@
+import { useI18n } from "@/contexts/I18nContext";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { useCallback } from "react";
@@ -30,6 +31,8 @@ const badgeVariants = cva("mx-auto py-2 px-3 rounded-full font-bold", {
 export function InvoiceWarrantyBadge({
   daysToExpire,
 }: InvoiceWarrantyBadgeProps) {
+  const { t } = useI18n();
+
   const getVariant = useCallback(() => {
     if (daysToExpire <= 0) return WarningLevel.EXPIRED;
     if (daysToExpire <= 30) return WarningLevel.CRITICAL;
@@ -39,7 +42,7 @@ export function InvoiceWarrantyBadge({
 
   return (
     <span className={cn(badgeVariants({ variant: getVariant() }))}>
-      {daysToExpire > 0 ? `${daysToExpire} dias` : "Garantia Expirada"}
+      {daysToExpire > 0 ? `${daysToExpire} ${t("invoices.daysToExpire")}` : t("invoices.expired")}
     </span>
   );
 }

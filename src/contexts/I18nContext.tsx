@@ -81,6 +81,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "invoices.title": "Minhas Notas Fiscais",
     "invoices.search": "Buscar notas...",
     "invoices.emptyState": "Você ainda não tem notas fiscais. Comece fazendo o upload!",
+    "invoices.expired": "Garantia Expirada",
+    "invoices.daysToExpire": "Dias",
+    "invoices.warrantyExpiresIn": "Garantia Expira Em",
     // Upload
     "upload.title": "Upload de Nota Fiscal",
     "upload.description": "Faça o upload das suas notas fiscais em PDF ou imagem",
@@ -166,6 +169,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "invoices.title": "My Invoices",
     "invoices.search": "Search invoices...",
     "invoices.emptyState": "You don't have any invoices yet. Start by uploading one!",
+    "invoices.expired": "Warranty Expired",
+    "invoices.daysToExpire": "Dias",
+    "invoices.warrantyExpiresIn": "Warranty Expires In",
     // Upload
     "upload.title": "Upload Invoice",
     "upload.description": "Upload your invoices in PDF or image format",
@@ -251,6 +257,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "invoices.title": "Mis Facturas",
     "invoices.search": "Buscar facturas...",
     "invoices.emptyState": "Aún no tienes facturas. ¡Comienza subiendo una!",
+    "invoices.expired": "Garantía Caducada",
+    "invoices.daysToExpire": "Días",
+    "invoices.warrantyExpiresIn": "La garantía vence el",
     // Upload
     "upload.title": "Subir Factura",
     "upload.description": "Sube tus facturas en formato PDF o imagen",
