@@ -151,7 +151,6 @@ export default function Profile() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">{t("firstVisit.phone")}</Label>
               <PhoneInput
                 label={t("profile.phone")}
                 placeholder={t("auth.phonePlaceholder")}
