@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesInsert } from "@/integrations/supabase/types";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -352,18 +353,28 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
           .insert({
             user_id: user.id,
             retailer_id: null,
+            file_path: "",
             access_key: invoiceForm.access_key,
             number: invoiceForm.number,
             series: invoiceForm.series || null,
             issue_date: invoiceForm.issue_date,
-            total_amount: invoiceForm.total_amount,
+            total_amount: Number(invoiceForm.total_amount),
             kind: invoiceForm.kind,
             emitente_cnpj: invoiceForm.emitente_cnpj,
             emitente_name: invoiceForm.emitente_name || null,
             item_description: invoiceForm.item_description || null,
-            item_quantity: invoiceForm.item_quantity,
-            item_unit_price: invoiceForm.item_unit_price,
-            item_line_total: invoiceForm.item_line_total,
+            item_quantity:
+              invoiceForm.item_quantity !== undefined && invoiceForm.item_quantity !== null && String(invoiceForm.item_quantity).trim() !== ""
+                ? Number(invoiceForm.item_quantity)
+                : null,
+            item_unit_price:
+              invoiceForm.item_unit_price !== undefined && invoiceForm.item_unit_price !== null && String(invoiceForm.item_unit_price).trim() !== ""
+                ? Number(invoiceForm.item_unit_price)
+                : null,
+            item_line_total:
+              invoiceForm.item_line_total !== undefined && invoiceForm.item_line_total !== null && String(invoiceForm.item_line_total).trim() !== ""
+                ? Number(invoiceForm.item_line_total)
+                : null,
             warranty_days:
               invoiceForm.warranty_value !== undefined && invoiceForm.warranty_value !== null && invoiceForm.warranty_value !== ""
                 ? (
@@ -374,7 +385,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                         : Number(invoiceForm.warranty_value)
                   )
                 : null,
-          })
+          } as TablesInsert<"invoices">)
           .select("id");
 
         if (insertRes.error) throw insertRes.error;
@@ -403,6 +414,12 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                 contentType: selectedFile.type || undefined,
               });
             if (uploadError) throw uploadError;
+
+            // Atualiza o file_path após upload bem-sucedido
+            await supabase
+              .from("invoices")
+              .update({ file_path: storagePath })
+              .eq("id", insertedId);
           } catch (uploadErr: any) {
             console.error("Erro ao enviar arquivo para Storage:", uploadErr?.message ?? uploadErr);
             toast.error("Arquivo não pôde ser salvo no Storage.");
@@ -799,6 +816,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                           },
                           cancel: {
                             label: "Cancelar",
+                            onClick: () => {},
                           },
                         });
                       } else {
