@@ -152,7 +152,7 @@ export default function Invoices() {
               {/* Lista em cards para mobile */}
               <div className="md:hidden space-y-3">
                 {filtered.map((inv) => (
-                  <div key={inv.id} className="rounded-lg border bg-card p-4 flex flex-col gap-3">
+                  <div key={inv.id} className="rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 p-4 flex flex-col gap-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Número</p>
