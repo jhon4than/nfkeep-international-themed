@@ -62,9 +62,15 @@ export type Database = {
         Row: {
           access_key: string
           created_at: string
+          emitente_cnpj: string | null
+          emitente_name: string | null
           file_path: string
           id: string
           issue_date: string
+          item_description: string | null
+          item_line_total: number | null
+          item_quantity: number | null
+          item_unit_price: number | null
           kind: string
           number: string
           retailer_id: string | null
@@ -72,6 +78,7 @@ export type Database = {
           total_amount: number
           updated_at: string
           user_id: string
+          warranty_days: number | null
           warranty_end: string | null
           warranty_months: number | null
           xml_data: Json | null
@@ -79,9 +86,15 @@ export type Database = {
         Insert: {
           access_key: string
           created_at?: string
+          emitente_cnpj?: string | null
+          emitente_name?: string | null
           file_path: string
           id?: string
           issue_date: string
+          item_description?: string | null
+          item_line_total?: number | null
+          item_quantity?: number | null
+          item_unit_price?: number | null
           kind: string
           number: string
           retailer_id?: string | null
@@ -89,6 +102,7 @@ export type Database = {
           total_amount: number
           updated_at?: string
           user_id: string
+          warranty_days?: number | null
           warranty_end?: string | null
           warranty_months?: number | null
           xml_data?: Json | null
@@ -96,9 +110,15 @@ export type Database = {
         Update: {
           access_key?: string
           created_at?: string
+          emitente_cnpj?: string | null
+          emitente_name?: string | null
           file_path?: string
           id?: string
           issue_date?: string
+          item_description?: string | null
+          item_line_total?: number | null
+          item_quantity?: number | null
+          item_unit_price?: number | null
           kind?: string
           number?: string
           retailer_id?: string | null
@@ -106,6 +126,7 @@ export type Database = {
           total_amount?: number
           updated_at?: string
           user_id?: string
+          warranty_days?: number | null
           warranty_end?: string | null
           warranty_months?: number | null
           xml_data?: Json | null
@@ -154,6 +175,7 @@ export type Database = {
           full_name: string | null
           id: string
           notifications_enabled: boolean | null
+          phone: string | null
           updated_at: string | null
         }
         Insert: {
@@ -162,6 +184,7 @@ export type Database = {
           full_name?: string | null
           id: string
           notifications_enabled?: boolean | null
+          phone?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -170,6 +193,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           notifications_enabled?: boolean | null
+          phone?: string | null
           updated_at?: string | null
         }
         Relationships: []

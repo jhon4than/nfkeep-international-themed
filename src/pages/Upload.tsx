@@ -359,6 +359,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
             item_quantity: invoiceForm.item_quantity,
             item_unit_price: invoiceForm.item_unit_price,
             item_line_total: invoiceForm.item_line_total,
+            file_path: "", // Campo obrigatório, será atualizado após upload
             warranty_days:
               invoiceForm.warranty_value !== undefined && invoiceForm.warranty_value !== null && invoiceForm.warranty_value !== ""
                 ? (

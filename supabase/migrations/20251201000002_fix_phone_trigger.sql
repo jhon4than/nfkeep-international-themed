@@ -30,11 +30,13 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.users_public (id, full_name, phone)
+  INSERT INTO public.users_public (id, full_name, phone, notifications_enabled, first_visit)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
-    NEW.raw_user_meta_data->>'phone'
+    NEW.raw_user_meta_data->>'phone',
+    false,
+    true
   );
   RETURN NEW;
 EXCEPTION
@@ -42,10 +44,12 @@ EXCEPTION
     -- Log do erro para debug
     RAISE LOG 'Erro ao inserir usuário: %', SQLERRM;
     -- Inserir sem o campo phone se houver erro
-    INSERT INTO public.users_public (id, full_name)
+    INSERT INTO public.users_public (id, full_name, notifications_enabled, first_visit)
     VALUES (
       NEW.id,
-      COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', '')
+      COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
+      false,
+      true
     );
     RETURN NEW;
 END;

@@ -33,11 +33,10 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.users_public (id, full_name, phone)
+  INSERT INTO public.users_public (id, full_name)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
-    NEW.raw_user_meta_data->>'phone'
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', '')
   );
   RETURN NEW;
 END;
