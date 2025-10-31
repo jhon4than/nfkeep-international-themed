@@ -472,7 +472,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
           </div>
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 <Image className="h-5 w-5 sm:h-6 sm:w-6" />
                 Upload de Nota Fiscal
               </CardTitle>
@@ -483,9 +483,9 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
             <CardContent className="space-y-4 sm:space-y-6">
               {/* Upload Area */}
               <div className="space-y-4">
-                <Label>Selecionar Imagem</Label>
+                <Label className="text-sm sm:text-base">Selecionar Imagem</Label>
                 <div
-                  className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors cursor-pointer ${
+                  className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors cursor-pointer min-h-[160px] sm:min-h-[200px] ${
                     isDragging 
                       ? 'border-primary bg-primary/5' 
                       : 'border-muted-foreground/25 hover:border-muted-foreground/50'
@@ -633,7 +633,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
             }}
           >
             <DialogContent
-              className="w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto"
+              className="w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto p-4 sm:p-6 rounded-none sm:rounded-lg"
               onInteractOutside={(e) => {
                 if (preventClose) {
                   e.preventDefault();
@@ -675,8 +675,8 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
               }}
             >
               <DialogHeader>
-                <DialogTitle>Confirmar dados da Nota Fiscal</DialogTitle>
-                <DialogDescription>Revise os campos e ajuste antes de salvar</DialogDescription>
+                <DialogTitle className="text-lg sm:text-xl">Confirmar dados da Nota Fiscal</DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">Revise os campos e ajuste antes de salvar</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
