@@ -166,15 +166,15 @@ export default function Dashboard() {
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-2">
                   {t("dashboard.title")}
                 </h1>
-                <p className="text-slate-600 dark:text-slate-300 text-lg">
+                <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
                   {t("dashboard.welcome")}
                 </p>
               </div>
               <div className="mt-4 sm:mt-0">
-                <Button asChild size="lg" className="shadow-lg">
+                <Button asChild size="lg" className="shadow-lg w-full sm:w-auto">
                   <Link to="/upload">
                     <Upload className="mr-2 h-5 w-5" />
                     {t("dashboard.uploadInvoice")}
@@ -193,12 +193,12 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
                       {t("dashboard.totalInvoices")}
                     </p>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                    <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                       {totalInvoices}
                     </p>
                   </div>
                   <div className="p-3 bg-mynf-primary/10 dark:bg-mynf-primary/20 rounded-full">
-                    <FileText className="h-6 w-6 text-mynf-primary dark:text-mynf-primary" />
+                    <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-mynf-primary dark:text-mynf-primary" />
                   </div>
                 </div>
               </CardContent>
@@ -211,12 +211,12 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
                       {t("dashboard.thisMonth")}
                     </p>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                    <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
                       {thisMonthCount}
                     </p>
                   </div>
                   <div className="p-3 bg-mynf-secondary/10 dark:bg-mynf-secondary/20 rounded-full">
-                    <Calendar className="h-6 w-6 text-mynf-secondary dark:text-mynf-secondary" />
+                    <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-mynf-secondary dark:text-mynf-secondary" />
                   </div>
                 </div>
               </CardContent>
@@ -260,8 +260,30 @@ export default function Dashboard() {
                   </Button>
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
-                  <Table>
+                <>
+                  {/* Lista em cards para mobile */}
+                  <div className="sm:hidden space-y-3">
+                    {recentInvoices.map((inv) => (
+                      <div key={inv.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                        <div className="space-y-1">
+                          <div className="text-sm font-semibold text-slate-900 dark:text-white">{inv.number}</div>
+                          <div className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                            <span>{new Date(inv.issue_date).toLocaleDateString('pt-BR')}</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 uppercase">
+                              {inv.kind}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right font-semibold text-slate-900 dark:text-white">
+                          {formatCurrency(inv.total_amount)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Tabela com scroll horizontal para iPad/desktop */}
+                  <div className="hidden sm:block overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                    <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50 dark:bg-slate-700/50">
                         <TableHead className="font-semibold text-slate-900 dark:text-white">{t("dashboard.tableNumber")}</TableHead>
@@ -290,8 +312,9 @@ export default function Dashboard() {
                         </TableRow>
                       ))}
                     </TableBody>
-                  </Table>
-                </div>
+                    </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -300,11 +323,11 @@ export default function Dashboard() {
 
       {/* Modal de Primeira Visita */}
       <Dialog open={showFirstVisitModal} onOpenChange={setShowFirstVisitModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-mynf-primary/10 rounded-full">
-                <Bell className="h-6 w-6 text-mynf-primary" />
+                <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-mynf-primary" />
               </div>
               <DialogTitle className="text-xl font-semibold text-slate-900 dark:text-white">
               {t("firstVisit.title")}
@@ -356,18 +379,18 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button
               variant="outline"
               onClick={handleSkipRegistration}
-              className="flex-1"
+              className="w-full sm:flex-1"
               disabled={isLoading}
             >
               {t("firstVisit.skip")}
             </Button>
             <Button
               onClick={handleCompleteRegistration}
-              className="flex-1"
+              className="w-full sm:flex-1"
               disabled={isLoading}
             >
               {isLoading ? (

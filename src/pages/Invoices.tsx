@@ -97,10 +97,10 @@ export default function Invoices() {
 
   return (
     <AppSidebarLayout>
-            <main className="container mx-auto p-6 space-y-6">
+            <main className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
 
       <div>
-        <h1 className="text-3xl font-bold">{t("invoices.title")}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">{t("invoices.title")}</h1>
       </div>
 
       <div className="relative">
@@ -109,7 +109,7 @@ export default function Invoices() {
           placeholder={t("invoices.search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
+          className="pl-9 h-10 sm:h-11"
         />
       </div>
 
@@ -123,67 +123,126 @@ export default function Invoices() {
               {t("invoices.emptyState")}
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Número</TableHead>
-                  <TableHead>Emissão</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead>Arquivo</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Lista em cards para mobile */}
+              <div className="md:hidden space-y-3">
                 {filtered.map((inv) => (
-                  <TableRow key={inv.id}>
-                    <TableCell>{inv.number}</TableCell>
-                    <TableCell>{inv.issue_date}</TableCell>
-                    <TableCell className="uppercase">{inv.kind}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(inv.total_amount)}</TableCell>
-                    <TableCell>
-                      {previews[inv.id] ? (
-                        previews[inv.id].type === "image" ? (
-                          <img
-                            src={previews[inv.id].url}
-                            alt="Arquivo da nota"
-                            className="h-16 w-auto rounded border"
-                          />
+                  <div key={inv.id} className="rounded-lg border bg-card p-4 flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">Número</p>
+                        <p className="text-base font-semibold">{inv.number ?? "—"}</p>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <p className="text-sm text-muted-foreground">Valor</p>
+                        <p className="text-base font-semibold">{formatCurrency(inv.total_amount)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="text-muted-foreground">
+                        {inv.issue_date ? new Date(inv.issue_date as any).toLocaleDateString("pt-BR") : "—"}
+                      </div>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 uppercase">
+                        {inv.kind}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        {previews[inv.id] ? (
+                          previews[inv.id].type === "image" ? (
+                            <img
+                              src={previews[inv.id].url}
+                              alt="Arquivo da nota"
+                              className="h-10 w-auto rounded border"
+                            />
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(previews[inv.id].url, "_blank")}
+                            >
+                              PDF
+                            </Button>
+                          )
                         ) : (
-                          <Button
-                            variant="outline"
-                            onClick={() => window.open(previews[inv.id].url, "_blank")}
-                          >
-                            Visualizar PDF
-                          </Button>
-                        )
-                      ) : (
-                        <span className="text-muted-foreground">Sem arquivo</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="secondary" onClick={() => viewDetails(inv.id)}>
+                          <span className="text-muted-foreground text-sm">Sem arquivo</span>
+                        )}
+                      </div>
+                      <Button variant="secondary" size="sm" onClick={() => viewDetails(inv.id)}>
                         Detalhes
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Tabela com scroll para iPad/desktop */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Número</TableHead>
+                      <TableHead>Emissão</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead>Arquivo</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((inv) => (
+                      <TableRow key={inv.id}>
+                        <TableCell>{inv.number}</TableCell>
+                        <TableCell>
+                          {inv.issue_date ? new Date(inv.issue_date as any).toLocaleDateString("pt-BR") : "—"}
+                        </TableCell>
+                        <TableCell className="uppercase">{inv.kind}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(inv.total_amount)}</TableCell>
+                        <TableCell>
+                          {previews[inv.id] ? (
+                            previews[inv.id].type === "image" ? (
+                              <img
+                                src={previews[inv.id].url}
+                                alt="Arquivo da nota"
+                                className="h-16 w-auto rounded border"
+                              />
+                            ) : (
+                              <Button
+                                variant="outline"
+                                onClick={() => window.open(previews[inv.id].url, "_blank")}
+                              >
+                                Visualizar PDF
+                              </Button>
+                            )
+                          ) : (
+                            <span className="text-muted-foreground">Sem arquivo</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="secondary" onClick={() => viewDetails(inv.id)}>
+                            Detalhes
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-3xl md:max-w-4xl p-4 sm:p-6 rounded-none sm:rounded-lg max-h-[85vh] sm:max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detalhes da Nota</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Detalhes da Nota</DialogTitle>
           </DialogHeader>
           {detailsLoading ? (
             <p className="text-muted-foreground">Carregando...</p>
           ) : detailsData ? (
             <div className="space-y-4">
               {/* Cabeçalho amigável */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                   <p className="text-sm text-muted-foreground">Número</p>
                   <p className="text-lg font-semibold">{detailsData.number ?? "—"}</p>
@@ -199,7 +258,7 @@ export default function Invoices() {
               </div>
 
               {/* Grade de campos formatados e traduzidos */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {Object.entries(detailsData)
                   .filter(([key]) => !/^id$/i.test(key) && !/_id$/i.test(key))
                   .filter(([key]) => !["number", "issue_date"].includes(key))

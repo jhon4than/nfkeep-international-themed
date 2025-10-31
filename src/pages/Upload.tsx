@@ -462,30 +462,30 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
 
   return (
     <AppSidebarLayout>
-      <div className="container mx-auto p-6">
-        <div className=" space-y-6">
+      <div className="container mx-auto p-4 sm:p-6">
+        <div className="space-y-4 sm:space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">{t("upload.title")}</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold">{t("upload.title")}</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Envie um arquivo (imagem, PDF ou XML) para processarmos os dados da sua nota.
             </p>
           </div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Image className="h-6 w-6" />
+                <Image className="h-5 w-5 sm:h-6 sm:w-6" />
                 Upload de Nota Fiscal
               </CardTitle>
               <CardDescription>
                 Selecione ou arraste o arquivo da sua nota fiscal para processar.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               {/* Upload Area */}
               <div className="space-y-4">
                 <Label>Selecionar Imagem</Label>
                 <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                  className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors cursor-pointer ${
                     isDragging 
                       ? 'border-primary bg-primary/5' 
                       : 'border-muted-foreground/25 hover:border-muted-foreground/50'
@@ -502,19 +502,19 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                         <img
                           src={previewUrl}
                           alt="Preview"
-                          className="max-w-full max-h-64 mx-auto rounded-lg shadow-md"
+                          className="max-w-full max-h-48 sm:max-h-64 mx-auto rounded-lg shadow-md"
                         />
                       ) : selectedFile.type === 'application/pdf' ? (
-                         <div className="w-32 h-32 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center mx-auto">
+                         <div className="w-28 h-28 sm:w-32 sm:h-32 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center mx-auto">
                            <div className="text-center">
-                             <div className="text-red-600 text-2xl mb-2">📄</div>
+                             <div className="text-red-600 text-xl sm:text-2xl mb-2">📄</div>
                              <div className="text-xs text-red-600 font-medium">PDF</div>
                            </div>
                          </div>
                        ) : (selectedFile.type === 'text/xml' || selectedFile.type === 'application/xml' || selectedFile.name.toLowerCase().endsWith('.xml')) ? (
-                         <div className="w-32 h-32 bg-blue-50 border-2 border-blue-200 rounded-lg flex items-center justify-center mx-auto">
+                         <div className="w-28 h-28 sm:w-32 sm:h-32 bg-blue-50 border-2 border-blue-200 rounded-lg flex items-center justify-center mx-auto">
                            <div className="text-center">
-                             <div className="text-blue-600 text-2xl mb-2">📋</div>
+                             <div className="text-blue-600 text-xl sm:text-2xl mb-2">📋</div>
                              <div className="text-xs text-blue-600 font-medium">XML</div>
                            </div>
                          </div>
@@ -525,7 +525,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <UploadIcon className="h-12 w-12 mx-auto text-muted-foreground" />
+                      <UploadIcon className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground" />
                       <div>
                         <p className="text-lg font-medium">Arraste um arquivo (imagem, PDF ou XML)</p>
                         <p className="text-sm text-muted-foreground">ou clique para selecionar (máximo 10MB)</p>
@@ -543,11 +543,11 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
               </div>
 
               {/* Ações */}
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Button
                   onClick={sendToWebhook}
                   disabled={!selectedFile || loading}
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                 >
                   {loading ? (
                     <>
@@ -564,6 +564,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                 <Button
                   variant="secondary"
                   onClick={() => { setInvoiceForm(initialInvoiceForm); setDialogOpen(true); }}
+                  className="w-full sm:w-auto"
                 >
                   Abrir Formulário
                 </Button>
@@ -571,6 +572,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                   variant="outline"
                   onClick={clearSelection}
                   disabled={!selectedFile}
+                  className="w-full sm:w-auto"
                 >
                   Limpar
                 </Button>
@@ -631,7 +633,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
             }}
           >
             <DialogContent
-              className="max-w-2xl"
+              className="w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto"
               onInteractOutside={(e) => {
                 if (preventClose) {
                   e.preventDefault();
@@ -677,7 +679,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                 <DialogDescription>Revise os campos e ajuste antes de salvar</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label>Access Key</Label>
                     <Input value={invoiceForm.access_key}
@@ -722,7 +724,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                     <Input value={invoiceForm.emitente_name}
                       onChange={(e) => updateForm({ emitente_name: e.target.value })} />
                   </div>
-                  <div className="md:col-span-2">
+                  <div className="sm:col-span-2">
                     <Label>Item Descrição</Label>
                     <Input value={invoiceForm.item_description}
                       onChange={(e) => updateForm({ item_description: e.target.value })} />
@@ -743,7 +745,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                       onChange={(e) => updateForm({ item_line_total: e.target.value })} />
                   </div>
                   {/* Garantia */}
-                  <div className="md:col-span-2">
+                  <div className="sm:col-span-2">
                     <Label>Garantia</Label>
                     <div className="grid grid-cols-2 gap-2 mt-2">
                       <Input
@@ -770,8 +772,8 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                     <p className="text-xs text-muted-foreground mt-1">Exemplo: 1 ano, 6 meses, 20 dias</p>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <Button onClick={saveInvoice} disabled={saving || !user}>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Button onClick={saveInvoice} disabled={saving || !user} className="w-full sm:w-auto">
                     {saving ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -805,6 +807,7 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                         setFormDirty(false);
                       }
                     }}
+                    className="w-full sm:w-auto"
                   >
                     Cancelar
                   </Button>
