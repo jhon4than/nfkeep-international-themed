@@ -48,7 +48,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "dashboard.thisMonth": "Este Mês",
     "dashboard.emptyState": "Nenhuma nota fiscal encontrada. Faça o upload da sua primeira nota!",
     "dashboard.quickActions": "Ações Rápidas",
-    "dashboard.uploadInvoice": "Fazer Upload",
+    "dashboard.uploadInvoice": "Adicionar Nota Fiscal",
     "dashboard.uploadDescription": "Envie uma nova nota fiscal",
     "dashboard.viewInvoices": "Ver Notas",
     "dashboard.viewInvoicesDescription": "Visualizar todas as notas fiscais",
