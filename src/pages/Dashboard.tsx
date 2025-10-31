@@ -56,7 +56,7 @@ export default function Dashboard() {
     
     setIsLoading(true);
     try {
-      let updateData: any = {
+      const updateData: any = {
         first_visit: false
       };
 
@@ -168,7 +168,7 @@ export default function Dashboard() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
-      <div className="min-h-screen bg-gradient-to-br from-mynf-background via-mynf-surface to-mynf-background dark:from-mynf-background dark:via-mynf-surface dark:to-mynf-background">
+      <div className="min-h-screen">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
           <div className="mb-8">
