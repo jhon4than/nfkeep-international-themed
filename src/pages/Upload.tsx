@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import type { TablesInsert } from "@/integrations/supabase/types";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -287,12 +286,17 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
   };
 
   const clearSelection = () => {
+    // Evita que o fechamento do Dialog abra confirmação de saída
+    setSkipExitConfirmOnce(true);
+    exitGuardRef.current = true;
+    setDialogOpen(false);
+
+    // Limpa estados do formulário e upload
+    setInvoiceForm(initialInvoiceForm);
+    setFormDirty(false);
     setSelectedFile(null);
     setPreviewUrl(null);
     setResponse(null);
-    setInvoiceForm(initialInvoiceForm);
-    setDialogOpen(false);
-    setFormDirty(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -343,29 +347,34 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
 
       const proceedSave = async () => {
         setSaving(true);
-        
-        const invoiceData: TablesInsert<"invoices"> = {
-          user_id: user.id,
-          retailer_id: null,
-          access_key: invoiceForm.access_key,
-          number: invoiceForm.number,
-          series: invoiceForm.series || null,
-          issue_date: invoiceForm.issue_date,
-          total_amount: Number(invoiceForm.total_amount),
-          kind: invoiceForm.kind,
-          emitente_cnpj: invoiceForm.emitente_cnpj,
-          emitente_name: invoiceForm.emitente_name || null,
-          item_description: invoiceForm.item_description || null,
-          item_quantity: invoiceForm.item_quantity ? Number(invoiceForm.item_quantity) : null,
-          item_unit_price: invoiceForm.item_unit_price ? Number(invoiceForm.item_unit_price) : null,
-          item_line_total: invoiceForm.item_line_total ? Number(invoiceForm.item_line_total) : null,
-          file_path: "", // Campo obrigatório, será atualizado após upload
-          warranty_days: warranty_days,
-        };
-        
         const insertRes = await supabase
           .from("invoices")
-          .insert(invoiceData)
+          .insert({
+            user_id: user.id,
+            retailer_id: null,
+            access_key: invoiceForm.access_key,
+            number: invoiceForm.number,
+            series: invoiceForm.series || null,
+            issue_date: invoiceForm.issue_date,
+            total_amount: invoiceForm.total_amount,
+            kind: invoiceForm.kind,
+            emitente_cnpj: invoiceForm.emitente_cnpj,
+            emitente_name: invoiceForm.emitente_name || null,
+            item_description: invoiceForm.item_description || null,
+            item_quantity: invoiceForm.item_quantity,
+            item_unit_price: invoiceForm.item_unit_price,
+            item_line_total: invoiceForm.item_line_total,
+            warranty_days:
+              invoiceForm.warranty_value !== undefined && invoiceForm.warranty_value !== null && invoiceForm.warranty_value !== ""
+                ? (
+                    invoiceForm.warranty_unit === "ano"
+                      ? Number(invoiceForm.warranty_value) * 365
+                      : invoiceForm.warranty_unit === "mes"
+                        ? Number(invoiceForm.warranty_value) * 30
+                        : Number(invoiceForm.warranty_value)
+                  )
+                : null,
+          })
           .select("id");
 
         if (insertRes.error) throw insertRes.error;
@@ -400,6 +409,9 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
           }
         }
         toast.success("Nota fiscal salva com sucesso!");
+
+        // Reset de formulário e upload após salvar com sucesso
+        clearSelection();
       };
 
       if (warrantyEmpty) {
@@ -781,8 +793,11 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
                               setDialogOpen(false);
                               setInvoiceForm(initialInvoiceForm);
                               setFormDirty(false);
-                            }
-                          }
+                            },
+                          },
+                          cancel: {
+                            label: "Cancelar",
+                          },
                         });
                       } else {
                         setDialogOpen(false);
