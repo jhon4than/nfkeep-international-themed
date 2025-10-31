@@ -150,20 +150,26 @@ export type Database = {
       users_public: {
         Row: {
           created_at: string | null
+          first_visit: boolean | null
           full_name: string | null
           id: string
+          notifications_enabled: boolean | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          first_visit?: boolean | null
           full_name?: string | null
           id: string
+          notifications_enabled?: boolean | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          first_visit?: boolean | null
           full_name?: string | null
           id?: string
+          notifications_enabled?: boolean | null
           updated_at?: string | null
         }
         Relationships: []

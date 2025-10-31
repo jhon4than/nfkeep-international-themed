@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AppSidebarLayout from "@/components/AppSidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Upload, ArrowRight, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { FileText, Upload, ArrowRight, Calendar, Bell, User, CheckCircle, Phone } from "lucide-react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { t } = useI18n();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [totalInvoices, setTotalInvoices] = useState<number>(0);
   const [thisMonthCount, setThisMonthCount] = useState<number>(0);
@@ -22,6 +28,15 @@ export default function Dashboard() {
     total_amount: number;
     kind: string;
   }>>([]);
+  
+  // Estados para o modal de primeira visita
+  const [showFirstVisitModal, setShowFirstVisitModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'phone' | 'notifications'>('phone'); // Novo estado para controlar o modo do modal
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+55"); // Código do país padrão (Brasil)
+  const [isLoading, setIsLoading] = useState(false);
 
   const formatDate = (d: Date) => {
     const y = d.getFullYear();
@@ -35,10 +50,84 @@ export default function Dashboard() {
     currency: "BRL",
   }).format(n ?? 0);
 
+  const handleCompleteRegistration = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      let updateData: any = {
+        first_visit: false
+      };
+
+      // Se estamos no modo telefone, salvar apenas telefone
+      if (modalMode === 'phone') {
+        const fullPhone = phone.trim() ? `${countryCode}${phone}` : "";
+        updateData.phone = fullPhone;
+      }
+      
+      // Sempre salvar preferências de notificação
+      updateData.notifications_enabled = notificationsEnabled;
+
+      const { error } = await supabase
+        .from("users_public")
+        .update(updateData)
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      toast.success(t("firstVisit.saveSuccess"));
+      setShowFirstVisitModal(false);
+    } catch (error) {
+      console.error("Erro ao salvar configurações:", error);
+      toast.error(t("firstVisit.saveError"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSkipRegistration = async () => {
+    if (!user) return;
+    
+    try {
+      await supabase
+        .from("users_public")
+        .update({ first_visit: false })
+        .eq("id", user.id);
+      
+      setShowFirstVisitModal(false);
+    } catch (error) {
+      console.error("Erro ao pular configuração:", error);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
 
     const load = async () => {
+      // Verificar se é primeira visita
+      const { data: userProfile } = await supabase
+        .from("users_public")
+        .select("first_visit, full_name, phone, notifications_enabled")
+        .eq("id", user.id)
+        .single();
+
+      // Determinar se deve mostrar o modal e em que modo
+      if (userProfile?.first_visit || !userProfile?.phone) {
+        setFullName(userProfile?.full_name || "");
+        setPhone(userProfile?.phone || "");
+        setNotificationsEnabled(userProfile?.notifications_enabled || false);
+        
+        // Se não tem telefone, mostrar modo telefone
+        // Se tem telefone mas é primeira visita, mostrar modo notificações
+        if (!userProfile?.phone) {
+          setModalMode('phone');
+        } else {
+          setModalMode('notifications');
+        }
+        
+        setShowFirstVisitModal(true);
+      }
+
       const now = new Date();
       const firstDay = formatDate(new Date(now.getFullYear(), now.getMonth(), 1));
       const lastDay = formatDate(new Date(now.getFullYear(), now.getMonth() + 1, 0));
@@ -208,6 +297,91 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Modal de Primeira Visita */}
+      <Dialog open={showFirstVisitModal} onOpenChange={setShowFirstVisitModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-mynf-primary/10 rounded-full">
+                <Bell className="h-6 w-6 text-mynf-primary" />
+              </div>
+              <DialogTitle className="text-xl font-semibold text-slate-900 dark:text-white">
+              {t("firstVisit.title")}
+            </DialogTitle>
+          </div>
+          <DialogDescription className="text-slate-600 dark:text-slate-400">
+            {modalMode === 'phone' ? t("firstVisit.descriptionPhone") : t("firstVisit.descriptionNotifications")}
+          </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+
+
+            {/* Telefone - apenas no modo telefone */}
+            {modalMode === 'phone' && (
+              <div className="space-y-2">
+                <PhoneInput
+                  label={t("firstVisit.phone")}
+                  placeholder={t("auth.phonePlaceholder")}
+                  hint={t("auth.phoneHint")}
+                  value={phone}
+                  countryCode={countryCode}
+                  onChange={setPhone}
+                  onCountryCodeChange={setCountryCode}
+                />
+              </div>
+            )}
+
+            {/* Notificações - sempre mostrar */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Bell className="h-4 w-4" />
+                {t("firstVisit.notifications")}
+              </Label>
+              <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">
+                    {t("firstVisit.webhookAlerts")}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t("firstVisit.webhookDescription")}
+                  </p>
+                </div>
+                <Switch
+                  checked={notificationsEnabled}
+                  onCheckedChange={setNotificationsEnabled}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={handleSkipRegistration}
+              className="flex-1"
+              disabled={isLoading}
+            >
+              {t("firstVisit.skip")}
+            </Button>
+            <Button
+              onClick={handleCompleteRegistration}
+              className="flex-1"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                t("firstVisit.saving")
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  {t("firstVisit.save")}
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppSidebarLayout>
   );
 }

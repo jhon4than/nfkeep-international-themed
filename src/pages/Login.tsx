@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -20,6 +21,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [countryCode, setCountryCode] = useState("+55"); // Código do país padrão (Brasil)
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -35,7 +37,7 @@ export default function Login() {
     }
   }, [user, navigate]);
 
-  const isValidWhatsapp = (value: string) => {
+  const isValidPhone = (value: string) => {
     // Validação simples: E.164 (+DD... até 15 dígitos) ou somente dígitos 8-15
     const e164 = /^\+?[1-9]\d{7,14}$/;
     return e164.test(value.replace(/\s|-/g, ""));
@@ -62,9 +64,10 @@ export default function Login() {
         toast.success(t("common.success"));
         navigate("/dashboard");
       } else {
-        // Signup: validar WhatsApp
-        if (!isValidWhatsapp(whatsapp)) {
-          toast.error(t("auth.whatsappInvalid"));
+        // Signup: validar telefone
+        const fullPhone = countryCode + whatsapp;
+        if (!isValidPhone(fullPhone)) {
+          toast.error(t("auth.phoneInvalid"));
           setLoading(false);
           return;
         }
@@ -74,7 +77,7 @@ export default function Login() {
           password,
           options: {
             emailRedirectTo: redirectUrl,
-            data: { full_name: fullName, whatsapp },
+            data: { full_name: fullName, phone: fullPhone },
           },
         });
         if (error) throw error;
@@ -234,23 +237,17 @@ export default function Login() {
                 </div>
               )}
               {!isLogin && (
-                <div className="space-y-3">
-                  <Label htmlFor="whatsapp" className="text-sm font-medium">
-                    {t("auth.whatsapp")}
-                  </Label>
-                  <Input
-                    id="whatsapp"
-                    type="tel"
-                    placeholder={t("auth.whatsappPlaceholder")}
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    className="h-12"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {t("auth.whatsappHint")}
-                  </p>
-                </div>
+                <PhoneInput
+                  id="whatsapp"
+                  label={t("auth.phone")}
+                  placeholder={t("auth.phonePlaceholder").replace(/^\+\d+\s/, "")}
+                  value={whatsapp}
+                  onChange={setWhatsapp}
+                  countryCode={countryCode}
+                  onCountryCodeChange={setCountryCode}
+                  hint={t("auth.phoneHint")}
+                  required
+                />
               )}
               <div className="space-y-3">
                 <Label htmlFor="email" className="text-sm font-medium">

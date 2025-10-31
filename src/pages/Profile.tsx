@@ -6,28 +6,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Bell, BellOff } from "lucide-react";
 
 export default function Profile() {
   const { t } = useI18n();
   const { user } = useAuth();
 
   const [fullName, setFullName] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+55"); // Código do país padrão (Brasil)
   const [loading, setLoading] = useState(false);
-  const [whatsappValid, setWhatsappValid] = useState<boolean | null>(null);
+  const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [firstVisit, setFirstVisit] = useState(true);
 
-  const isValidWhatsapp = (value: string) => {
+  const isValidPhone = (value: string) => {
     if (!value.trim()) return null; // Campo vazio não é nem válido nem inválido
     const e164 = /^\+?[1-9]\d{7,14}$/;
     return e164.test(value.replace(/\s|-/g, ""));
   };
 
-  const handleWhatsappChange = (value: string) => {
-    setWhatsapp(value);
-    setWhatsappValid(isValidWhatsapp(value));
+  const handlePhoneChange = (value: string) => {
+    setPhone(value);
+    setPhoneValid(isValidPhone(value));
   };
 
   useEffect(() => {
@@ -40,18 +45,46 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from("users_public")
-        .select("full_name")
+        .select("full_name, phone, notifications_enabled, first_visit")
         .eq("id", user?.id)
         .single();
 
       if (error) throw error;
       if (data) {
         setFullName(data.full_name || "");
+        
+        // Separar código do país do número de telefone
+        const fullPhone = data.phone || "";
+        if (fullPhone.startsWith("+")) {
+          // Lista de códigos de país suportados (ordenados do maior para o menor para evitar conflitos)
+          const supportedCodes = ["+598", "+351", "+55", "+54", "+57", "+56", "+52", "+51", "+49", "+44", "+39", "+34", "+33", "+1"];
+          
+          let foundCode = null;
+          for (const code of supportedCodes) {
+            if (fullPhone.startsWith(code)) {
+              foundCode = code;
+              break;
+            }
+          }
+          
+          if (foundCode) {
+            setCountryCode(foundCode);
+            setPhone(fullPhone.substring(foundCode.length).trim());
+          } else {
+            // Se não encontrar um código conhecido, usar +55 como padrão
+            setCountryCode("+55");
+            setPhone(fullPhone.substring(1)); // Remove apenas o +
+          }
+        } else {
+          // Se não começar com +, assumir que é um número brasileiro
+          setCountryCode("+55");
+          setPhone(fullPhone);
+        }
+        
+        setNotificationsEnabled(data.notifications_enabled || false);
+        setFirstVisit(data.first_visit || false);
+        setPhoneValid(isValidPhone(fullPhone));
       }
-      // Carregar WhatsApp do user_metadata
-      const metaWhatsapp = (user?.user_metadata as any)?.whatsapp || "";
-      setWhatsapp(metaWhatsapp);
-      setWhatsappValid(isValidWhatsapp(metaWhatsapp));
     } catch (error: any) {
       console.error("Error loading profile:", error.message);
     }
@@ -60,9 +93,12 @@ export default function Profile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validar WhatsApp apenas se não estiver vazio
-    if (whatsapp.trim() && !isValidWhatsapp(whatsapp)) {
-      toast.error(t("auth.whatsappInvalid"));
+    // Concatenar código do país com número de telefone
+    const fullPhone = phone.trim() ? `${countryCode}${phone}` : "";
+    
+    // Validar telefone apenas se não estiver vazio
+    if (fullPhone && !isValidPhone(fullPhone)) {
+      toast.error(t("firstVisit.phoneInvalid"));
       return;
     }
     
@@ -71,13 +107,17 @@ export default function Profile() {
     try {
       const { error } = await supabase
         .from("users_public")
-        .update({ full_name: fullName })
+        .update({ 
+          full_name: fullName,
+          phone: fullPhone,
+          notifications_enabled: notificationsEnabled,
+          first_visit: false
+        })
         .eq("id", user?.id);
 
       if (error) throw error;
-      // Atualizar WhatsApp em user_metadata
-      const { error: metaError } = await supabase.auth.updateUser({ data: { whatsapp } });
-      if (metaError) throw metaError;
+      
+      setFirstVisit(false);
       toast.success(t("profile.updateSuccess"));
     } catch (error: any) {
       toast.error(error.message);
@@ -109,36 +149,55 @@ export default function Profile() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="whatsapp">{t("profile.whatsapp")}</Label>
-              <div className="relative">
-                <Input
-                  id="whatsapp"
-                  type="tel"
-                  inputMode="tel"
-                  placeholder={t("auth.whatsappPlaceholder")}
-                  value={whatsapp}
-                  onChange={(e) => handleWhatsappChange(e.target.value)}
-                  className={`pr-10 ${
-                    whatsappValid === true 
-                      ? "border-mynf-success focus:ring-mynf-success" 
-                      : whatsappValid === false 
-                      ? "border-mynf-error focus:ring-mynf-error" 
-                      : ""
-                  }`}
-                />
-                {whatsappValid !== null && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    {whatsappValid ? (
-                      <CheckCircle className="h-4 w-4 text-mynf-success" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-mynf-error" />
-                    )}
-                  </div>
+              <Label htmlFor="phone">{t("firstVisit.phone")}</Label>
+              <PhoneInput
+                label={t("profile.phone")}
+                placeholder={t("auth.phonePlaceholder")}
+                hint={t("auth.phoneHint")}
+                value={phone}
+                countryCode={countryCode}
+                onChange={handlePhoneChange}
+                onCountryCodeChange={setCountryCode}
+                isValid={phoneValid}
+                error={phoneValid === false ? t("auth.phoneInvalid") : undefined}
+              />
+            </div>
+
+            {/* Seção de Notificações */}
+            <div className="space-y-4 pt-4 border-t">
+              <div className="flex items-center space-x-3">
+                {notificationsEnabled ? (
+                  <Bell className="h-5 w-5 text-mynf-primary" />
+                ) : (
+                  <BellOff className="h-5 w-5 text-muted-foreground" />
                 )}
+                <div className="flex-1">
+                  <Label htmlFor="notifications" className="text-base font-medium">
+                    Notificações de Alertas
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receba notificações sobre vencimento de garantias e outros alertas importantes
+                  </p>
+                </div>
+                <Switch
+                  id="notifications"
+                  checked={notificationsEnabled}
+                  onCheckedChange={setNotificationsEnabled}
+                />
               </div>
-              <p className="text-xs text-muted-foreground">{t("auth.whatsappHint")}</p>
-              {whatsappValid === false && (
-                <p className="text-xs text-mynf-error">{t("auth.whatsappInvalid")}</p>
+              
+              {firstVisit && (
+                <div className="bg-mynf-primary/10 border border-mynf-primary/20 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <Bell className="h-5 w-5 text-mynf-primary mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-mynf-primary">Complete seu cadastro</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Ative as notificações para receber alertas importantes sobre suas notas fiscais e garantias.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             <Button type="submit" disabled={loading}>
