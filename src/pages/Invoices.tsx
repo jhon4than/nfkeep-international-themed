@@ -32,7 +32,7 @@ export default function Invoices() {
     const load = async () => {
       const { data } = await supabase
         .from("invoices")
-        .select("id, number, issue_date, kind, total_amount, access_key")
+        .select("*")
         .eq("user_id", user.id)
         .order("issue_date", { ascending: false });
       setInvoices(data ?? []);
