@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AppSidebarLayout from "@/components/AppSidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import type { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button"; 
@@ -21,6 +21,7 @@ export default function Invoices() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsData, setDetailsData] = useState<any>(null);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const formatCurrency = (n: number) => new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -30,38 +31,48 @@ export default function Invoices() {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const { data } = await supabase
-        .from("invoices")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("issue_date", { ascending: false });
-      setInvoices(data ?? []);
-
-      // Build previews for storage files associated to each invoice
-      const nextPreviews: Record<string, { url: string; type: "image" | "pdf" }> = {};
-      for (const inv of data ?? []) {
-        try {
-          const prefix = `${user.id}/${inv.id}`;
-          const { data: files, error } = await supabase.storage
-            .from("invoices")
-            .list(prefix, { limit: 100 });
-          if (error) continue;
-          if (!files || files.length === 0) continue;
-          const sorted = [...files].sort((a, b) => (a.name > b.name ? -1 : a.name < b.name ? 1 : 0));
-          const file = sorted[0];
-          const path = `${prefix}/${file.name}`;
-          const ext = file.name.split(".").pop()?.toLowerCase() || "";
-          const isImage = ["png", "jpg", "jpeg", "gif", "webp", "bmp"].includes(ext);
-          const type: "image" | "pdf" = isImage ? "image" : ext === "pdf" ? "pdf" : "image";
-          const { data: signed } = await supabase.storage
-            .from("invoices")
-            .createSignedUrl(path, 60 * 60);
-          if (signed?.signedUrl) {
-            nextPreviews[inv.id] = { url: signed.signedUrl, type };
-          }
-        } catch {}
+      setPageLoading(true);
+      let data: any[] | null = null;
+      try {
+        const res = await supabase
+          .from("invoices")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("issue_date", { ascending: false });
+        data = res.data ?? [];
+        setInvoices(data);
+      } finally {
+        // Oculta o loading assim que as notas forem carregadas (ou mesmo em caso de erro)
+        setPageLoading(false);
       }
-      setPreviews(nextPreviews);
+
+      // Construir previews em paralelo, sem bloquear a UI
+      void (async () => {
+        const nextPreviews: Record<string, { url: string; type: "image" | "pdf" }> = {};
+        for (const inv of data ?? []) {
+          try {
+            const prefix = `${user.id}/${inv.id}`;
+            const { data: files, error } = await supabase.storage
+              .from("invoices")
+              .list(prefix, { limit: 100 });
+            if (error) continue;
+            if (!files || files.length === 0) continue;
+            const sorted = [...files].sort((a, b) => (a.name > b.name ? -1 : a.name < b.name ? 1 : 0));
+            const file = sorted[0];
+            const path = `${prefix}/${file.name}`;
+            const ext = file.name.split(".").pop()?.toLowerCase() || "";
+            const isImage = ["png", "jpg", "jpeg", "gif", "webp", "bmp"].includes(ext);
+            const type: "image" | "pdf" = isImage ? "image" : ext === "pdf" ? "pdf" : "image";
+            const { data: signed } = await supabase.storage
+              .from("invoices")
+              .createSignedUrl(path, 60 * 60);
+            if (signed?.signedUrl) {
+              nextPreviews[inv.id] = { url: signed.signedUrl, type };
+            }
+          } catch {}
+        }
+        setPreviews(nextPreviews);
+      })();
     };
     load();
   }, [user]);
@@ -97,6 +108,11 @@ export default function Invoices() {
 
   return (
     <AppSidebarLayout>
+      {pageLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
             <main className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
 
       <div>
