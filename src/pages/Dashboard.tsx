@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { FileText, Upload, ArrowRight, Calendar, Bell, User, CheckCircle, Phone } from "lucide-react";
+import { FileText, Upload, ArrowRight, Calendar, Bell, User, CheckCircle, Phone, Loader2 } from "lucide-react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { toast } from "sonner";
 
@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("+55"); // Código do país padrão (Brasil)
   const [isLoading, setIsLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const formatDate = (d: Date) => {
     const y = d.getFullYear();
@@ -104,6 +105,7 @@ export default function Dashboard() {
     if (!user) return;
 
     const load = async () => {
+      setPageLoading(true);
       // Verificar se é primeira visita
       const { data: userProfile } = await supabase
         .from("users_public")
@@ -153,6 +155,7 @@ export default function Dashboard() {
         .order("issue_date", { ascending: false })
         .limit(5);
       setRecentInvoices(recentRes.data ?? []);
+      setPageLoading(false);
     };
 
     load();
@@ -160,6 +163,11 @@ export default function Dashboard() {
 
   return (
     <AppSidebarLayout>
+      {pageLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
       <div className="min-h-screen bg-gradient-to-br from-mynf-background via-mynf-surface to-mynf-background dark:from-mynf-background dark:via-mynf-surface dark:to-mynf-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}

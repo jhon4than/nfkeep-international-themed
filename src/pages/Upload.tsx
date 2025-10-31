@@ -479,6 +479,11 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
 
   return (
     <AppSidebarLayout>
+      {(loading || saving) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
       <div className="container mx-auto p-4 sm:p-6">
         <div className="space-y-4 sm:space-y-6">
           <div>

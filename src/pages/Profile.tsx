@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Bell, BellOff } from "lucide-react";
+import { CheckCircle, XCircle, Bell, BellOff, Loader2 } from "lucide-react";
 
 export default function Profile() {
   const { t } = useI18n();
@@ -20,6 +20,7 @@ export default function Profile() {
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("+55"); // Código do país padrão (Brasil)
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [firstVisit, setFirstVisit] = useState(true);
@@ -43,6 +44,7 @@ export default function Profile() {
 
   const loadProfile = async () => {
     try {
+      setPageLoading(true);
       const { data, error } = await supabase
         .from("users_public")
         .select("full_name, phone, notifications_enabled, first_visit")
@@ -87,6 +89,8 @@ export default function Profile() {
       }
     } catch (error: any) {
       console.error("Error loading profile:", error.message);
+    } finally {
+      setPageLoading(false);
     }
   };
 
@@ -128,6 +132,11 @@ export default function Profile() {
 
   return (
     <AppSidebarLayout>
+      {pageLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
             <main className="container mx-auto p-6 space-y-6">
 
       <div>
