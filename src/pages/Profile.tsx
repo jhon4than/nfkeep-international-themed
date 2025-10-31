@@ -88,6 +88,8 @@ export default function Profile() {
 
   return (
     <AppSidebarLayout>
+            <main className="container mx-auto p-6 space-y-6">
+
       <div>
         <h1 className="text-3xl font-bold">{t("profile.title")}</h1>
       </div>
@@ -147,6 +149,7 @@ export default function Profile() {
           </form>
         </CardContent>
       </Card>
+      </main>
     </AppSidebarLayout>
   );
 }
