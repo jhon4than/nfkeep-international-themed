@@ -385,6 +385,24 @@ Se alguma informação não estiver disponível, deixe o campo vazio (""). Retor
             console.warn("warranty_days update skipped:", e?.message ?? e);
           }
         }
+        // Upload do arquivo selecionado para o Storage do Supabase
+        if (insertedId && selectedFile) {
+          try {
+            const timestamp = Date.now();
+            const safeName = selectedFile.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+            const storagePath = `${user.id}/${insertedId}/${timestamp}_${safeName}`;
+            const { error: uploadError } = await supabase.storage
+              .from("invoices")
+              .upload(storagePath, selectedFile, {
+                upsert: true,
+                contentType: selectedFile.type || undefined,
+              });
+            if (uploadError) throw uploadError;
+          } catch (uploadErr: any) {
+            console.error("Erro ao enviar arquivo para Storage:", uploadErr?.message ?? uploadErr);
+            toast.error("Arquivo não pôde ser salvo no Storage.");
+          }
+        }
         toast.success("Nota fiscal salva com sucesso!");
       };
 
