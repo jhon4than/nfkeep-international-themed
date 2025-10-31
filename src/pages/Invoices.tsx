@@ -18,6 +18,7 @@ export default function Invoices() {
   type InvoiceRow = Database["public"]["Tables"]["invoices"]["Row"];
   const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [previews, setPreviews] = useState<Record<string, { url: string; type: "image" | "pdf" }>>({});
+  const [previewsLoading, setPreviewsLoading] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsData, setDetailsData] = useState<any>(null);
@@ -47,32 +48,40 @@ export default function Invoices() {
       }
 
       // Construir previews em paralelo, sem bloquear a UI
-      void (async () => {
-        const nextPreviews: Record<string, { url: string; type: "image" | "pdf" }> = {};
-        for (const inv of data ?? []) {
-          try {
-            const prefix = `${user.id}/${inv.id}`;
-            const { data: files, error } = await supabase.storage
-              .from("invoices")
-              .list(prefix, { limit: 100 });
-            if (error) continue;
-            if (!files || files.length === 0) continue;
-            const sorted = [...files].sort((a, b) => (a.name > b.name ? -1 : a.name < b.name ? 1 : 0));
-            const file = sorted[0];
-            const path = `${prefix}/${file.name}`;
-            const ext = file.name.split(".").pop()?.toLowerCase() || "";
-            const isImage = ["png", "jpg", "jpeg", "gif", "webp", "bmp"].includes(ext);
-            const type: "image" | "pdf" = isImage ? "image" : ext === "pdf" ? "pdf" : "image";
-            const { data: signed } = await supabase.storage
-              .from("invoices")
-              .createSignedUrl(path, 60 * 60);
-            if (signed?.signedUrl) {
-              nextPreviews[inv.id] = { url: signed.signedUrl, type };
-            }
-          } catch {}
-        }
-        setPreviews(nextPreviews);
-      })();
+      if ((data ?? []).length === 0) {
+        setPreviewsLoading(false);
+      } else {
+        setPreviewsLoading(true);
+        void (async () => {
+          const nextPreviews: Record<string, { url: string; type: "image" | "pdf" }> = {};
+          await Promise.allSettled(
+            (data ?? []).map(async (inv) => {
+              try {
+                const prefix = `${user.id}/${inv.id}`;
+                const { data: files, error } = await supabase.storage
+                  .from("invoices")
+                  .list(prefix, { limit: 100 });
+                if (error) return;
+                if (!files || files.length === 0) return;
+                const sorted = [...files].sort((a, b) => (a.name > b.name ? -1 : a.name < b.name ? 1 : 0));
+                const file = sorted[0];
+                const path = `${prefix}/${file.name}`;
+                const ext = file.name.split(".").pop()?.toLowerCase() || "";
+                const isImage = ["png", "jpg", "jpeg", "gif", "webp", "bmp"].includes(ext);
+                const type: "image" | "pdf" = isImage ? "image" : ext === "pdf" ? "pdf" : "image";
+                const { data: signed } = await supabase.storage
+                  .from("invoices")
+                  .createSignedUrl(path, 60 * 60);
+                if (signed?.signedUrl) {
+                  nextPreviews[inv.id] = { url: signed.signedUrl, type };
+                }
+              } catch {}
+            })
+          );
+          setPreviews(nextPreviews);
+          setPreviewsLoading(false);
+        })();
+      }
     };
     load();
   }, [user]);
@@ -108,7 +117,7 @@ export default function Invoices() {
 
   return (
     <AppSidebarLayout>
-      {pageLoading && (
+      {(pageLoading || previewsLoading) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
