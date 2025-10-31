@@ -1,4 +1,5 @@
 -- Verificar se a coluna phone existe e recriar o trigger se necessário
+
 DO $$
 BEGIN
     -- Verificar se a coluna phone existe
